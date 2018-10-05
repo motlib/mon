@@ -5,21 +5,8 @@ from mon.mqtt import MqttPublisher
 import ruamel.yaml
 
 import mon.collectors
-from mon.classreg import create_collector_instance
+from mon.classreg import create_collector_instance, create_all_collectors
 
-config = {
-    'global': {
-        'prefix': 'mon',
-        'broker': 'opi2',
-        'port': 1883,
-    },
-    'collectors': [
-        {
-            'class': 'mon.collectors.system.LoadAvg',
-            'interval': 4,            
-        },
-    ]
-}
 
 def load_config(filename):
     yaml = ruamel.yaml.YAML()
@@ -43,8 +30,9 @@ def create_collectors(colcfg):
 
 def main():
     config = load_config('./config/example.yaml')
-    
-    collectors = create_collectors(config['collectors'])
+
+    collectors = create_all_collectors()
+    #collectors = create_collectors(config['collectors'])
 
     mqtt_pub = MqttPublisher(cfg=config['global'])
     
