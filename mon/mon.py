@@ -1,8 +1,11 @@
-import mon.collectors.system
-from mon.classreg import create_collector_instance
 from time import sleep
 from datetime import datetime
 from mon.mqtt import MqttPublisher
+
+import ruamel.yaml
+
+import mon.collectors
+from mon.classreg import create_collector_instance
 
 config = {
     'global': {
@@ -13,11 +16,18 @@ config = {
     'collectors': [
         {
             'class': 'mon.collectors.system.LoadAvg',
-            'interval': 4,
-            
+            'interval': 4,            
         },
     ]
 }
+
+def load_config(filename):
+    yaml = ruamel.yaml.YAML()
+    with open(filename, 'r') as f:
+        cfg = yaml.load(f)
+
+    return cfg
+
 
 def create_collectors(colcfg):
     collectors = []
@@ -32,6 +42,8 @@ def create_collectors(colcfg):
 
 
 def main():
+    config = load_config('./config/example.yaml')
+    
     collectors = create_collectors(config['collectors'])
 
     mqtt_pub = MqttPublisher(cfg=config['global'])

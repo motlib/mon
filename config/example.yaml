@@ -1,0 +1,9 @@
+global:
+  broker: opi2
+  port: 1883
+  prefix: mon
+
+collectors:
+  - class: mon.collectors.system.LoadAvg
+    interval: 4
+
