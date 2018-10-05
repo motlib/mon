@@ -2,8 +2,14 @@ import mon.collectors.system
 from mon.classreg import create_collector_instance
 from time import sleep
 from datetime import datetime
+from mon.mqtt import MqttPublisher
 
 config = {
+    'global': {
+        'prefix': 'mon',
+        'broker': 'opi2',
+        'port': 1883,
+    },
     'collectors': [
         {
             'class': 'mon.collectors.system.LoadAvg',
@@ -28,12 +34,14 @@ def create_collectors(colcfg):
 def main():
     collectors = create_collectors(config['collectors'])
 
+    mqtt_pub = MqttPublisher(cfg=config['global'])
+    
     while True:
         # find runnable collectors and run them
         runnables = (col for col in collectors if col.is_ready())
         for col in runnables:
-            v = col.get_data()
-            print(v)
+            values = col.get_data()
+            mqtt_pub.publish_data(values)
 
         # find next ready time of a collector
         next_run = min(col.get_next_run() for col in collectors)

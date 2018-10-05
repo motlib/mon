@@ -10,7 +10,7 @@ class LoadAvg(CollectorBase):
 
         
     def get_namespace(self):
-        return '/system'
+        return 'system'
 
     
     def get_values(self):

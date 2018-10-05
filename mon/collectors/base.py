@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+from socket import getfqdn
+
 
 class CollectorBase():
     def __init__(self, cfg):
@@ -27,14 +29,14 @@ class CollectorBase():
     
     def get_next_run(self):
         return self._next_run
-    
+
     
     def get_data(self):
         values = self.get_values()
         ns = self.get_namespace()
 
-        # prepend namespace name to all value keys
-        data = {ns + '/' + k: v for k,v in values.items()}
+        # prepend prefix to all value keys
+        data = {ns +  '/' + k: v for k,v in values.items()}
 
         self._next_run = self._next_run + timedelta(seconds=self.get_interval())
         
