@@ -1,3 +1,4 @@
+import glob
 import re
 import socket
 
@@ -13,17 +14,14 @@ class LoadAvg(CollectorBase):
 
         
     def _get_values(self):
-        with open('/proc/loadavg', 'r') as f:
-            loaddata = f.readline()
-
         loaddata = self._get_file_data(
             filename='/proc/loadavg',
             firstline=True)
 
-        keys = ('loadavg_1', 'loadavg_5', 'loadavg_15')
+        keys = ('1m', '5m', '15m')
         values = (float(v) for v in loaddata.split(' ')[0:3])
 
-        return dict(zip(keys,values))
+        return {'loadavg': dict(zip(keys, values))}
 
 register_collector_class(LoadAvg)
     
@@ -71,7 +69,7 @@ class MemoryInfo(CollectorBase):
         super().__init__(
             cfg=cfg,
             interval=20,
-            namespace='memory')
+            namespace='')
 
         
     def _get_meminfo(self):
@@ -96,6 +94,8 @@ class MemoryInfo(CollectorBase):
         #  memory-usage-from-proc-meminfo-like-htop
 
         data = {}
+
+        data['total'] = meminfo['MemTotal']
         
         # All the memory used by the system.
         data['totalUsed'] = (meminfo['MemTotal'] - meminfo['MemFree']);
@@ -112,7 +112,7 @@ class MemoryInfo(CollectorBase):
         # Percent of memory used.
         data['pctInUse'] = float(data['inUse']) / meminfo['MemTotal']
         
-        return data;
+        return {'memory': data};
 
 register_collector_class(MemoryInfo)
 
@@ -170,3 +170,29 @@ class StorageInfo(CollectorBase):
         return stinfo
         
 register_collector_class(StorageInfo)
+
+
+class CpuTemp(CollectorBase):
+    def __init__(self, cfg):
+        super().__init__(
+            cfg=cfg,
+            interval=30,
+            namespace='')
+
+        
+    def _get_values(self):
+        pattern = '/sys/class/thermal/thermal_zone*/temp'
+
+        files = glob.iglob(pattern)
+
+        data = {}
+        for filename in files: 
+            temp = int(self._get_file_data(filename, firstline=True)) / 1000.0
+            zone = filename.split('/')[4]
+
+            data[zone] = temp
+
+        return {'cputemp': data}
+
+register_collector_class(CpuTemp)
+            
