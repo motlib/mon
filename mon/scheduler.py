@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 from time import sleep
 
 class Scheduler():
@@ -8,6 +9,8 @@ class Scheduler():
 
 
     def _do_work(self):
+        '''Process all tasks in ready state by running them through the work_fct.'''
+        
         # find ready tasks and run them
         ready_tasks = (t for t in self._tasks if t.is_ready())
         for t in ready_tasks:
@@ -26,6 +29,7 @@ class Scheduler():
             # we sleep additional 0.1 seconds to be sure the collector is ready 
             sleep_time = (next_run - datetime.now()).total_seconds() + .1
     
-            print('sleeping', sleep_time)
+            logging.debug(
+                'Scheduler sleeping for {s:.2f}s'.format(s=sleep_time))
             
             sleep(max(sleep_time, 0))

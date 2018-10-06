@@ -1,5 +1,6 @@
 import paho.mqtt.client as mqtt
 import socket
+import json
 
 class MqttPublisher():
     def __init__(self, cfg):
@@ -16,6 +17,10 @@ class MqttPublisher():
         
     def publish_data(self, data):
         for k in data:
-            self.client.publish(self._prefix + k, data[k])
+
+            topic = self._prefix + k
+            payload = json.dumps(data[k])
             
-            print(k, '->', data[k])
+            self.client.publish(topic, payload)
+            
+            print(topic, ':', payload)

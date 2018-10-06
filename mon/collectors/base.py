@@ -39,7 +39,7 @@ class CollectorBase():
         return data
 
 
-    def _get_file_data(self, filename, firstline=False):
+    def _get_file_data(self, filename, firstline=False, as_lines=False):
         '''Read contents of a file and return as string. If firstline is true, 
         only the first line of the file is returned.
 
@@ -47,16 +47,23 @@ class CollectorBase():
         
         with open(filename, 'r') as f:
             if firstline:
-                return f.readline()
+                s = f.readline()
             else:
-                return f.read()
+                s = f.read()
 
-            
-    def _get_cmd_data(self, cmd, firstline=False):
-        
-        output = check_output(cmd).decode('utf-8', errors='ignore')
-        
-        if firstline:
-            return output.split('\n')[0].strip()
+        if as_lines:
+            return s.split('\n')
         else:
-            return output
+            return s
+
+        
+    def _get_cmd_data(self, cmd, firstline=False, as_lines=False):        
+        output = check_output(cmd).decode('utf-8', errors='ignore')
+
+        if firstline:
+            return output.split('\n')[0]
+        else:
+            if as_lines:
+                return output.split('\n')
+            else:
+                return output
