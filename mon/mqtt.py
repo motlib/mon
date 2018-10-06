@@ -14,11 +14,29 @@ class MqttPublisher():
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
         
-        self.client.connect(cfg['broker'], cfg['port'])
-
+        self.connect()
+        
         # starts its own thread to handle network i/o
         self.client.loop_start()
 
+        
+    def connect(self):
+        # set up the last will message (must be before connect)
+        node_state_topic = self._prefix + 'node_state'
+        
+        self.client.will_set(
+            topic=node_state_topic,
+            payload='offline',
+            retain=True)
+        
+        self.client.connect(self._cfg['broker'], self._cfg['port'])
+
+        # publish, that we are online now
+        self.client.publish(
+            topic=node_state_topic,
+            payload='online',
+            retain=True)
+        
         
     def publish_data(self, data):
         for k in data:
