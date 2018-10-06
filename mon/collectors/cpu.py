@@ -35,14 +35,23 @@ register_collector_class(CpuTemp)
 
 class LsCpuInfoInterface(CollectorBase):
     def _get_cpuinfo(self):
-        output = self._get_cmd_data(['lscpu', '--json'])
+        output = self._get_cmd_data(['lscpu'], as_lines=True)
 
-        data = json.loads(output)
+        # currently not active, as json support in lscpu is quite new
+        #output = self._get_cmd_data(['lscpu', '--json'])
+        #data = json.loads(output)
 
         # Convert json structure. in json, the field names have a trailing
         # ':'. This is removed here, too.
-        data = {i['field'][:-1]: i['data'] for i in data['lscpu']}
+        #data = {i['field'][:-1]: i['data'] for i in data['lscpu']}
 
+        data = {}
+        for line in output:
+            m = re.match(r'^([^:]+):\s+(.*)$', line)
+
+            if m:
+                data[m.group(1)] = m.group(2)
+                
         return data
 
 
