@@ -1,11 +1,12 @@
-from time import sleep
-from datetime import datetime
-from mon.mqtt import MqttPublisher
+import argparse
+import logging
 
 import ruamel.yaml
 
-import mon.collectors
-from mon.classreg import create_collector_instance, create_all_collectors
+from mon.classreg import create_collectors, create_all_collectors
+from mon.mqtt import MqttPublisher
+from mon.scheduler import Scheduler
+import mon.__version__
 
 
 def load_config(filename):
@@ -16,40 +17,69 @@ def load_config(filename):
     return cfg
 
 
-def create_collectors(colcfg):
-    collectors = []
+def parse_cmdline(args=None):
+    parser = argparse.ArgumentParser(
+        prog=mon.__version__.__title__,
+        description='')
     
-    for cfg in colcfg:
-        inst = create_collector_instance(
-            clsname=cfg['class'],
-            cfg=cfg)
-        collectors.append(inst)
+    parser.add_argument(
+        '-c', '--config',
+        help='Configuration file name',
+        required=True)
 
-    return collectors
+    parser.add_argument(
+        '-a', '--all-collectors',
+        help=(
+            'Create instances of all collectors instead of the ones listed in '
+            'the configuration. '),
+        action='store_true')
 
+    parser.add_argument(
+        '-v', '--verbose',
+        help='Verbose output',
+        action='store_true')
+
+
+    return parser.parse_args(args)
+
+
+def setup_logging(verbose=False):
+    level = logging.DEBUG if verbose else logging.INFO
+    
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)s: %(message)s',
+        level=level)
+        
 
 def main():
-    config = load_config('./config/example.yaml')
+    args = parse_cmdline()
+    setup_logging(args.verbose)
 
-    collectors = create_all_collectors()
-    #collectors = create_collectors(config['collectors'])
+    # we do this here in the function, so logging is already available during
+    # import of the collectors.
+    import mon.collectors
 
-    mqtt_pub = MqttPublisher(cfg=config['global'])
-    
-    while True:
-        # find runnable collectors and run them
-        runnables = (col for col in collectors if col.is_ready())
-        for col in runnables:
-            values = col.get_data()
-            mqtt_pub.publish_data(values)
+    config = load_config(args.config)
 
-        # find next ready time of a collector
-        next_run = min(col.get_next_run() for col in collectors)
+    if args.all_collectors:
+        # for testing, create an instance of all collectors with default config
+        msg = 'Creating instances of all collectors, overriding configuration.'
+        logging.info(msg)
+        collectors = create_all_collectors()
+    else:
+        collectors = create_collectors(config['collectors'])
 
-        # we sleep additional 0.1 seconds to be sure the collector is ready 
-        sleep_time = (next_run - datetime.now()).total_seconds() + .1
+    mqtt_pub = MqttPublisher(
+        cfg=config['global'])
 
-        print('sleeping', sleep_time)
-        
-        sleep(max(sleep_time, 0))
+    def pub_collector_values(col):
+        values = col.get_data()
+        mqtt_pub.publish_data(values)
 
+    scheduler = Scheduler(
+        tasks=collectors,
+        work_fct=pub_collector_values)
+
+    # run the scheduler until end of time
+    logging.debug('Kicking off the scheduler.')
+    scheduler.run()

@@ -1,9 +1,15 @@
+import logging
+
 
 classes = {}
 
+
 def register_collector_class(cls):
-    classes[cls.__module__ + '.' + cls.__name__] = cls
-    print('Collector Class', cls, cls.__name__)
+    clsname = cls.__module__ + '.' + cls.__name__
+    classes[clsname] = cls
+
+    msg = "Registered collector class '{clsname}'."
+    logging.debug(msg.format(clsname=clsname))
 
     
 def create_collector_instance(clsname, **params):
@@ -13,6 +19,19 @@ def create_collector_instance(clsname, **params):
     cls = classes[clsname]
 
     return cls(**params)
+
+
+def create_collectors(colcfg):
+    collectors = []
+    
+    for cfg in colcfg:
+        inst = create_collector_instance(
+            clsname=cfg['class'],
+            cfg=cfg)
+        collectors.append(inst)
+
+    return collectors
+
 
 def create_all_collectors():
     collectors = []
