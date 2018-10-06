@@ -3,7 +3,7 @@ import logging
 
 import ruamel.yaml
 
-from mon.classreg import create_collectors, create_all_collectors
+from mon.classreg import create_collectors
 from mon.mqtt import MqttPublisher
 from mon.scheduler import Scheduler
 import mon.__version__
@@ -65,9 +65,10 @@ def main():
         # for testing, create an instance of all collectors with default config
         msg = 'Creating instances of all collectors, overriding configuration.'
         logging.info(msg)
-        collectors = create_all_collectors()
-    else:
-        collectors = create_collectors(config['collectors'])
+
+    collectors = create_collectors(
+        config['collectors'],
+        create_all=args.all_collectors)
 
     mqtt_pub = MqttPublisher(
         cfg=config['global'])

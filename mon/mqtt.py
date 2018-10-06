@@ -31,12 +31,6 @@ class MqttPublisher():
         
         self.client.connect(self._cfg['broker'], self._cfg['port'])
 
-        # publish, that we are online now
-        self.client.publish(
-            topic=node_state_topic,
-            payload='online',
-            retain=True)
-        
         
     def publish_data(self, data):
         for k in data:
@@ -53,6 +47,12 @@ class MqttPublisher():
         # FIXME: should be using logging
         msg = 'MQTT client connected to broker (rc={rc})'        
         print(msg.format(rc=rc))
+
+        # publish, that we are online now
+        self.client.publish(
+            topic=node_state_topic,
+            payload='online',
+            retain=True)
 
 
     def on_disconnect(self, mqttc, userdata, rc):

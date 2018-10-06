@@ -1,4 +1,5 @@
 import glob
+import json
 import re
 
 from mon.classreg import register_collector_class
@@ -34,17 +35,15 @@ register_collector_class(CpuTemp)
 
 class LsCpuInfoInterface(CollectorBase):
     def _get_cpuinfo(self):
-        output = self._get_cmd_data(['lscpu'], as_lines=True)
+        output = self._get_cmd_data(['lscpu', '--json'])
 
-        data = {}
-        for line in output:
-            m = re.match(r'^([^:]+):\s+(.*)$', line)
+        data = json.loads(output)
 
-            if m:
-                data[m.group(1)] = m.group(2)
-                
+        # Convert json structure. in json, the field names have a trailing
+        # ':'. This is removed here, too.
+        data = {i['field'][:-1]: i['data'] for i in data['lscpu']}
+
         return data
-    
 
 
 class CpuInfo(LsCpuInfoInterface):
@@ -63,12 +62,17 @@ class CpuInfo(LsCpuInfoInterface):
         
     def _get_values(self):
         data = self._get_cpuinfo()
+        result = {}
+        
+        if 'CPU(s)' in data:
+            result['cores'] = int(data['CPU(s)'])
+        else:
+            result['cores'] = 'n/a'
 
-        result = {
-            'cores': data.get('CPU(s)', 'n/a'),
-            'architecture': data.get('Architecture', 'n/a'),
-        }
+        result['architecture'] = data.get('Architecture', 'n/a')
 
+        print(result)
+        
         return { 'cpuinfo': result }
             
 register_collector_class(CpuInfo)
@@ -93,6 +97,6 @@ class CpuFrequency(LsCpuInfoInterface):
     def _get_values(self):
         data = self._get_cpuinfo()
 
-        return { 'cpu_frequency': data['CPU MHz'] }
+        return { 'cpu_frequency': float(data['CPU MHz']) }
             
 register_collector_class(CpuFrequency)
