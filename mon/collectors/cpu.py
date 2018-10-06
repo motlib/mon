@@ -12,7 +12,7 @@ class CpuTemp(CollectorBase):
         super().__init__(
             cfg=cfg,
             interval=30,
-            namespace='')
+            namespace='cpu')
 
         
     def _get_values(self):
@@ -27,25 +27,12 @@ class CpuTemp(CollectorBase):
 
             data[zone] = temp
 
-        return {'cputemp': data}
+        return {'temp': data}
 
 register_collector_class(CpuTemp)
 
 
-class CPUInfo(CollectorBase):
-    '''Collect basic information about the CPUs.'''
-    
-    def __init__(self, cfg):
-        super().__init__(
-            cfg=cfg,
-            interval=30,
-            namespace='')
-
-        
-    def check(self):
-        self._get_cmd_data(['lscpu'])
-
-
+class LsCpuInfoInterface(CollectorBase):
     def _get_cpuinfo(self):
         output = self._get_cmd_data(['lscpu'], as_lines=True)
 
@@ -57,6 +44,22 @@ class CPUInfo(CollectorBase):
                 data[m.group(1)] = m.group(2)
                 
         return data
+    
+
+
+class CpuInfo(LsCpuInfoInterface):
+    '''Collect basic information about the CPUs.'''
+    
+    def __init__(self, cfg):
+        super().__init__(
+            cfg=cfg,
+            interval=3600,
+            namespace='cpu')
+
+        
+    def check(self):
+        self._get_cmd_data(['lscpu'])
+        
         
     def _get_values(self):
         data = self._get_cpuinfo()
@@ -64,9 +67,32 @@ class CPUInfo(CollectorBase):
         result = {
             'cores': data.get('CPU(s)', 'n/a'),
             'architecture': data.get('Architecture', 'n/a'),
-            'frequency': data.get('CPU MHz', 'n/a'),
-            }
+        }
 
         return { 'cpuinfo': result }
             
-register_collector_class(CPUInfo)
+register_collector_class(CpuInfo)
+
+
+class CpuFrequency(LsCpuInfoInterface):
+    '''Collect basic information about the CPUs.'''
+    
+    def __init__(self, cfg):
+        super().__init__(
+            cfg=cfg,
+            interval=30,
+            namespace='cpu')
+
+        
+    def check(self):
+        cpuinfo = self._get_cpuinfo()
+        if 'CPU MHz' not in cpuinfo:
+            raise Exception('Architecture does not support CPU frequency reporting by lscpu.')
+
+
+    def _get_values(self):
+        data = self._get_cpuinfo()
+
+        return { 'cpu_frequency': data['CPU MHz'] }
+            
+register_collector_class(CpuFrequency)
