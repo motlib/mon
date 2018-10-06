@@ -20,13 +20,9 @@ class CollectorBase():
             
         self._next_run = datetime.now()
 
-        try:
-            self.check()
-        except Exception as e:
-            msg = "Requirements for collector '{0}' are not fulfilled: {1}"
-            logging.error(msg.format(
-                self.__class__.__name__,
-                e))
+        # this will raise exceptions, if the collector requirements are not
+        # fullfilled.
+        self.check()
 
 
     def check(self):
