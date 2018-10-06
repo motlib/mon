@@ -1,4 +1,3 @@
-import glob
 import re
 import socket
 
@@ -172,27 +171,4 @@ class StorageInfo(CollectorBase):
 register_collector_class(StorageInfo)
 
 
-class CpuTemp(CollectorBase):
-    def __init__(self, cfg):
-        super().__init__(
-            cfg=cfg,
-            interval=30,
-            namespace='')
-
-        
-    def _get_values(self):
-        pattern = '/sys/class/thermal/thermal_zone*/temp'
-
-        files = glob.iglob(pattern)
-
-        data = {}
-        for filename in files: 
-            temp = int(self._get_file_data(filename, firstline=True)) / 1000.0
-            zone = filename.split('/')[4]
-
-            data[zone] = temp
-
-        return {'cputemp': data}
-
-register_collector_class(CpuTemp)
             

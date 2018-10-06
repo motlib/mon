@@ -57,6 +57,6 @@ class MqttPublisher():
 
     def on_disconnect(self, mqttc, userdata, rc):
         # FIXME: should be using logging
-        msg = 'MQTT client lost connector to broker (rc={rc})'        
+        msg = 'MQTT client lost connection to broker (rc={rc})'        
         print(msg.format(rc=rc))
         

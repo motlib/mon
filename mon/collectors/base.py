@@ -19,6 +19,20 @@ class CollectorBase():
             
         self._next_run = datetime.now()
 
+        try:
+            self.check()
+        except Exception as e:
+            msg = "Requirements for collector '{0}' are not fulfilled: {1}"
+            logging.error(msg.format(
+                self.__class__.__name__,
+                e))
+
+
+    def check(self):
+        # this function can be overridden to check if all preconditions for this
+        # collector are fullfilled to be used. E.g. check if commands are available
+        pass
+
         
     def is_ready(self):
         return self._next_run < datetime.now()
