@@ -1,0 +1,12 @@
+{% extends 'page.html' %}
+
+
+{% block title %}Host List{% endblock %}
+
+{% block content %}
+<ul>
+  {% for host in hosts %}
+  <li><a href="hostinfo/{{ host }}">{{ host }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}
