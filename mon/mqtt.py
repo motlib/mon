@@ -26,7 +26,7 @@ class MqttPublisher():
         
         self.client.will_set(
             topic=node_state_topic,
-            payload='offline',
+            payload=json.dumps('offline'),
             retain=True)
         
         self.client.connect(self._cfg['broker'], self._cfg['port'])
@@ -38,7 +38,7 @@ class MqttPublisher():
             topic = self._prefix + k
             payload = json.dumps(data[k])
             
-            self.client.publish(topic, payload)
+            self.client.publish(topic, payload, retain=True)
             
             print(topic, ':', payload)
 
@@ -49,10 +49,7 @@ class MqttPublisher():
         print(msg.format(rc=rc))
 
         # publish, that we are online now
-        self.client.publish(
-            topic=node_state_topic,
-            payload='online',
-            retain=True)
+        self.publish_data(data={'node_state': 'online'})
 
 
     def on_disconnect(self, mqttc, userdata, rc):
