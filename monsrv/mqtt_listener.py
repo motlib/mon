@@ -29,21 +29,32 @@ class MqttListener():
 
 
     def on_message(self, client, userdata, msg):
+        try:
+            # strip base topic and following '/'
+            subtopic = msg.topic[len(self._cfg['base_topic']) + 1:]
 
-        # strip base topic and following '/'
-        subtopic = msg.topic[len(self._cfg['base_topic']) + 1:]
+            (host, clsname) = subtopic.split('/', maxsplit=1)
+        
+            self._handle_message(host, clsname, msg.payload)
+        except Exception as ex:
+            # FIXME: this is in another thread with no logging enabled
+            logging.exception("Failed to handle received message.")
 
-        (host, rest) = subtopic.split('/', maxsplit=1)
 
+    def _handle_message(self, host, clsname, sdata):
         #if rest == 'node_state':
         #    remove host
         with self._lock:
-            if host not in self._hosts:
-                self._hosts[host] = {}
+            if clsname == 'node_state' and sdata == 'offline':
+                # we do not keep any data from offline hosts
+                del self._hosts[host]
+            else:
+                if host not in self._hosts:
+                    self._hosts[host] = {}
 
-            self._hosts[host][rest] = json.loads(msg.payload)
-
+                self._hosts[host][clsname] = json.loads(sdata)
         
+
     def get_host_list(self):
         with self._lock:
             return list(self._hosts.keys())

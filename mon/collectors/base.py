@@ -39,15 +39,21 @@ class CollectorBase():
         return self._next_run
 
     
+    def get_interval(self):
+        return self._interval
+
+    
     def get_data(self):
+        topic = self._cfg.get('topic', self.__class__.__name__)
+
         values = self._get_values()
 
         # prepend prefix to all value keys
-        data = {self._ns + k: v for k,v in values.items()}
+        #data = {self._ns + k: v for k,v in values.items()}
 
         self._next_run = (self._next_run + timedelta(seconds=self._interval))
         
-        return data
+        return (topic, values)
 
 
     def _get_file_data(self, filename, firstline=False, as_lines=False):

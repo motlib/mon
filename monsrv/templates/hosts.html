@@ -6,7 +6,10 @@
 {% block content %}
 <ul>
   {% for host in hosts %}
-  <li><a href="hostinfo/{{ host }}">{{ host }}</a></li>
+  <li>
+    <a href="{{ url_for('host_info', host=host) }}">{{ host }}</a>
+    <a href="{{ url_for('raw_host_info', host=host) }}">raw</a>
+  </li>
   {% endfor %}
 </ul>
 {% endblock %}

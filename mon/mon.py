@@ -71,11 +71,11 @@ def main():
         create_all=args.all_collectors)
 
     mqtt_pub = MqttPublisher(
-        cfg=config['global'])
+        cfg=config['global']
+    )
 
     def pub_collector_values(col):
-        values = col.get_data()
-        mqtt_pub.publish_data(values)
+        mqtt_pub.publish_data(col)
 
     scheduler = Scheduler(
         tasks=collectors,

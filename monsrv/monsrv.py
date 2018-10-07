@@ -1,5 +1,9 @@
-from flask import Flask, render_template
+import json
+
+from flask import Flask, render_template, Response
+
 from mqtt_listener import MqttListener
+
 
 app = Flask(__name__)
 
@@ -19,6 +23,13 @@ def host_info(host):
     data = mqttl.get_host_data(host)
 
     return render_template('hostinfo.html', host=host, data=data)
+
+
+@app.route('/rawhostinfo/<host>')
+def raw_host_info(host):
+    data = mqttl.get_host_data(host)
+
+    return Response(json.dumps(data), mimetype='application/json')
 
 
 

@@ -3,8 +3,9 @@ import socket
 
 from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
-        
-class LoadAvg(CollectorBase):
+
+
+class RuntimeInfo(CollectorBase):
     def __init__(self, cfg):
         super().__init__(
             cfg=cfg,
@@ -12,38 +13,34 @@ class LoadAvg(CollectorBase):
             namespace='system')
 
         
-    def _get_values(self):
+    def _get_loadavg(self):
         loaddata = self._get_file_data(
             filename='/proc/loadavg',
             firstline=True)
 
-        keys = ('1m', '5m', '15m')
-        values = (float(v) for v in loaddata.split(' ')[0:3])
+        values = [float(v) for v in loaddata.split(' ')[0:3]]
 
-        return {'loadavg': dict(zip(keys, values))}
+        return values
 
-register_collector_class(LoadAvg)
     
-
-class Uptime(CollectorBase):
-    def __init__(self, cfg):
-        super().__init__(
-            cfg=cfg,
-            interval=60,
-            namespace='system')
-
-
-    def _get_values(self):
+    def _get_uptime(self):
         data = self._get_file_data(
             filename='/proc/uptime',
             firstline=True)
 
-        return {
-            'uptime': float(data.split(' ')[0])
+        return float(data.split(' ')[0])
+
+    
+    def _get_values(self):
+        data = {
+            'loadavg': self._get_loadavg(),
+            'uptime': self._get_uptime(),
         }
         
-register_collector_class(Uptime)
+        return data
 
+register_collector_class(RuntimeInfo)
+    
 
 class HostInfo(CollectorBase):
     def __init__(self, cfg):
@@ -111,64 +108,11 @@ class MemoryInfo(CollectorBase):
         # Percent of memory used.
         data['pctInUse'] = float(data['inUse']) / meminfo['MemTotal']
         
-        return {'memory': data};
+        return data
 
 register_collector_class(MemoryInfo)
 
 
-class StorageInfo(CollectorBase):
-    def __init__(self, cfg):
-        super().__init__(
-            cfg=cfg,
-            interval=60,
-            namespace='storage')
-
-
-    def _get_storage_info(self):
-        data = self._get_cmd_data(['df', '-T'], as_lines=True)
-
-        result = []
-        
-        # skip first line with heading
-        for line in data[1:]:
-            stinfo = {}
-
-            # Expect 7 fields separated by multiple spaces.
-            # /dev/sda1      ext4      28704676   5411692  21811820  20% /
-            #m = re.match(
-            #    r'([^ ]*)\s+([^ ]*)\s+([^ ]*)\s+([^ ]*)\s+([^ ]*)\s+([^ ]*)%\s+([^ ]*)',
-            #    line)
-
-            m = line.split()
-            
-            if m:
-                stinfo = {
-                    'device': m[0],
-                    'type': m[1],
-                    'size': int(m[2]),
-                    'used': int(m[3]),
-                    'free': int(m[4]),
-                    'used_pct': float(m[3]) / float(m[2]) * 100,
-                    'mount_point': m[6],
-                }
-
-                result.append(stinfo)
-        
-        return result
-        
-
-    def _get_values(self):
-        stinfo = self._get_storage_info()
-
-        ignore_fstypes = self._cfg.get('ignore_fstypes', ['tmpfs', 'devtmpfs'])
-
-        stinfo = {s['mount_point'].replace('/', '_'):s
-                  for s in stinfo
-                  if s['type'] not in ignore_fstypes}
-
-        return stinfo
-        
-register_collector_class(StorageInfo)
 
 
             

@@ -4,9 +4,9 @@ import re
 
 from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
+            
 
-
-class CpuTemp(CollectorBase):
+class CpuInfo(CollectorBase):
     '''Get CPU (and other zones) temperature.'''
     
     def __init__(self, cfg):
@@ -16,25 +16,11 @@ class CpuTemp(CollectorBase):
             namespace='cpu')
 
         
-    def _get_values(self):
-        pattern = '/sys/class/thermal/thermal_zone*/temp'
-
-        files = glob.iglob(pattern)
-
-        data = {}
-        for filename in files: 
-            temp = int(self._get_file_data(filename, firstline=True)) / 1000.0
-            zone = filename.split('/')[4]
-
-            data[zone] = temp
-
-        return {'temp': data}
-
-register_collector_class(CpuTemp)
-
-
-class LsCpuInfoInterface(CollectorBase):
-    def _get_cpuinfo(self):
+    def check(self):
+        self._get_cmd_data(['lscpu'])
+        
+        
+    def _get_lscpuinfo(self):
         output = self._get_cmd_data(['lscpu'], as_lines=True)
 
         # currently not active, as json support in lscpu is quite new
@@ -53,59 +39,40 @@ class LsCpuInfoInterface(CollectorBase):
                 data[m.group(1)] = m.group(2)
                 
         return data
+        
+    def _get_temperatures(self):
+        pattern = '/sys/class/thermal/thermal_zone*/temp'
 
+        files = glob.iglob(pattern)
 
-class CpuInfo(LsCpuInfoInterface):
-    '''Collect basic information about the CPUs.'''
+        data = []
+        for filename in sorted(files): 
+            temp = int(self._get_file_data(filename, firstline=True)) / 1000.0
+
+            data.append(temp)
+
+        return data
+
     
-    def __init__(self, cfg):
-        super().__init__(
-            cfg=cfg,
-            interval=3600,
-            namespace='cpu')
-
-        
-    def check(self):
-        self._get_cmd_data(['lscpu'])
-        
-        
     def _get_values(self):
-        data = self._get_cpuinfo()
+        info = self._get_lscpuinfo()
         result = {}
         
-        if 'CPU(s)' in data:
-            result['cores'] = int(data['CPU(s)'])
-        else:
-            result['cores'] = 'n/a'
+        if 'CPU(s)' in info:
+            result['cores'] = int(info['CPU(s)'])
+        if 'Architecture' in info:
+            result['architecture'] = info['Architecture']
+        if 'CPU MHz' in info:
+            result['frequency'] = float(info['CPU MHz'])
 
-        result['architecture'] = data.get('Architecture', 'n/a')
-
-        print(result)
+        if 'CPU min MHz' in info:
+            result['min_frequency'] = info['CPU min MHz']
+        if 'CPU max MHz' in info:
+            result['max_frequency'] = info['CPU max MHz']
         
-        return { 'cpuinfo': result }
             
-register_collector_class(CpuInfo)
-
-
-class CpuFrequency(LsCpuInfoInterface):
-    '''Collect basic information about the CPUs.'''
+        result['zone_temperatures'] = self._get_temperatures()
+            
+        return result
     
-    def __init__(self, cfg):
-        super().__init__(
-            cfg=cfg,
-            interval=30,
-            namespace='cpu')
-
-        
-    def check(self):
-        cpuinfo = self._get_cpuinfo()
-        if 'CPU MHz' not in cpuinfo:
-            raise Exception('Architecture does not support CPU frequency reporting by lscpu.')
-
-
-    def _get_values(self):
-        data = self._get_cpuinfo()
-
-        return { 'cpu_frequency': float(data['CPU MHz']) }
-            
-register_collector_class(CpuFrequency)
+register_collector_class(CpuInfo)
