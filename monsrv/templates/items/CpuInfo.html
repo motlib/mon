@@ -1,0 +1,21 @@
+{% extends "items/itembase.html" %}
+
+{% block itemdata %}
+<p>
+  The CPU ({{ item.architecture }}) has {{ item.cores }} cores. 
+
+  {% if item.zone_temperatures|length > 0 %}
+  Zone temperatures:
+  {% for t in item.zone_temperatures %}
+  <b>{{ html_color(t, (t - 20) / 60, format='{t:.1f}°C') | safe }}</b>
+  {% endfor %}
+  {% endif %}
+
+  {% if item.min_frequency and item.max_frequency %}
+  Frequency range
+  {{ "%.0f"|format(item.min_frequency) }}
+  to
+  {{ "%.0f"|format(item.max_frequency) }} MHz.
+  {% endif %}
+</p>
+{% endblock %}

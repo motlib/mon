@@ -1,15 +1,18 @@
 <html>
   <head>
     <title>MONSRV</title>
+    <meta name="viewport"
+          content="width=device-width; initial-scale=1.0" />
     <link rel="stylesheet"
           type="text/css"
           href="{{ url_for('static', filename='style.css') }}" />
+    <script type="text/javascript"
+            src="{{ url_for('static', filename='toggle.js') }}"></script>
   </head>
 
   <body>
     <div id="header">
-      <p>MONSRV</p>
-      <h1>{% block title %}{% endblock %}</h1>
+      <h1>MONSRV: {% block title %}{% endblock %}</h1>
     </div>
 
     <div id="content">

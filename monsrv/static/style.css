@@ -1,9 +1,67 @@
-body {
-    font-family: sans-serif;
+body {    
+    font-family: Calibri, sans-serif;
+    color: black;
+    background-color: white;
 }
 
-#header {
-    padding: 1em;
-    background-color: #164744;
-    color: #e5f9e0;
+h1 {
+    font-size: 10pt;
+    font-weight: bold;
+}
+
+/* Developer info footer */
+p.devinfo {
+    font-size: 8pt;
+    color: gray;
+    text-align: center;
+}
+
+
+/* Toolbox styles */
+
+.toolbox {
+    font-size: 8pt;
+    margin-top: 5pt;
+    border: 2pt solid lightgray;
+}
+
+.toolbox .heading {
+    font-size: 8pt;
+    background-color: lightgray;
+    padding: 2px;
+    margin: 0;
+    
+}
+
+.toolbox .heading:hover {
+    cursor: pointer;
+}
+
+.toolbox:hover {
+    border-color: gray;
+}
+
+.toolbox .content {
+    padding: 2pt
+}
+
+.toolbox .content  pre {
+    margin: 0;
+    overflow: auto;
+}
+
+.toolbox .content p {
+    margin: 2pt;
+}
+
+/* Styles for data tables */
+
+.datatable, .datatable * th, .datatable * td {
+    font-size: 8pt;
+    border-collapse: collapse;
+    border: 1px solid gray;
+}
+
+.datatable * th, .datatable * td {
+    padding: 1.5pt;
 }

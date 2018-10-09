@@ -5,10 +5,10 @@ from flask import Flask, render_template, Response
 from jinja2.exceptions import TemplateNotFound
 
 from mqtt_listener import MqttListener
-
+from style import get_html_color, get_css_color
 
 app = Flask(__name__)
-
+app.jinja_env.globals.update(html_color=get_html_color, css_color=get_css_color)
 port = 5000
 
 mqttl = None
