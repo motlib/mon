@@ -66,10 +66,9 @@ class CpuInfo(CollectorBase):
             result['frequency'] = float(info['CPU MHz'])
 
         if 'CPU min MHz' in info:
-            result['min_frequency'] = info['CPU min MHz']
+            result['min_frequency'] = float(info['CPU min MHz'])
         if 'CPU max MHz' in info:
-            result['max_frequency'] = info['CPU max MHz']
-        
+            result['max_frequency'] = float(info['CPU max MHz'])
             
         result['zone_temperatures'] = self._get_temperatures()
             
