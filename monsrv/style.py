@@ -9,15 +9,23 @@ _red_green_map = (
 ) 
 
 
-# Map val between 0 and 1 to a color, e.g. to be used for a color
-# scale indicating system load or temperature.
-#
-# By default a green - orange - red map is used, but other maps can
-# be supplied in the map parameter as an array of RGB vectors.
-#
-# @returns An array with red, green, blue components.
-def get_color_mapping(val, minval=0.0, maxval=1.0, cmap=_red_green_map):
+def _get_color_mapping(val, minval=0.0, maxval=1.0, cmap=_red_green_map):
+    '''Map val between 0 and 1 to a color, e.g. to be used for a color scale
+    indicating system load or temperature.
+    
+    :param val: The value to use for color coding.
 
+    :param minval: The minimum posible value (by default coded as pure green)
+
+    :param maxval: The maxumim possible value (by default coded as pure red)
+
+    :param cmap: The color map. By default a green - orange - red map is used,
+    but other maps can be supplied as an iterable of RGB tuples.
+
+    :return: An array with red, green, blue components.
+
+    '''
+    
     # map range to [0.0, 1.0]
     val = (val - minval) / (maxval - minval)
     
@@ -56,7 +64,7 @@ def get_color_mapping(val, minval=0.0, maxval=1.0, cmap=_red_green_map):
 
 # Map a value between 0 and 1 to a color between red and green.
 def get_css_color(v, minval=0.0, maxval=1.0, cmap=_red_green_map):
-    col = get_color_mapping(val=v, minval=minval, maxval=maxval, cmap=cmap)
+    col = _get_color_mapping(val=v, minval=minval, maxval=maxval, cmap=cmap)
     
     return "rgb({0}, {1}, {2})".format(*col)
 

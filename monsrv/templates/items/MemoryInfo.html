@@ -1,0 +1,8 @@
+{% extends "items/itembase.html" %}
+
+{% block itemdata %}
+<p>
+  The system uses {{ fmt_bytes(1024*item.inUse) }} of {{ fmt_bytes(1024*item.total) }} memory, i.e.
+  <b>{{ html_color(item.pctInUse, minval=0, maxval=100, fmt='{v:.0f}%') | safe }}</b>
+</p>
+{% endblock %}
