@@ -2,15 +2,14 @@ import re
 import socket
 
 from mon.classreg import register_collector_class
-from mon.collectors.base import CollectorBase
+from mon.collectors.base import CollectorBase    
 
-
-class RuntimeInfo(CollectorBase):
+class HostInfo(CollectorBase):
     def __init__(self, cfg):
         super().__init__(
             cfg=cfg,
-            interval=30,
-            namespace='system')
+            interval=3600,
+            namespace='')
 
         
     def _get_loadavg(self):
@@ -30,31 +29,20 @@ class RuntimeInfo(CollectorBase):
 
         return float(data.split(' ')[0])
 
+
+    def _get_kernel(self):
+        return self._get_cmd_data(
+            cmd=['uname', '-r'],
+            firstline=True,
+            as_lines=False)
+
     
-    def _get_values(self):
-        data = {
-            'loadavg': self._get_loadavg(),
-            'uptime': self._get_uptime(),
-        }
-        
-        return data
-
-register_collector_class(RuntimeInfo)
-    
-
-class HostInfo(CollectorBase):
-    def __init__(self, cfg):
-        super().__init__(
-            cfg=cfg,
-            interval=3600,
-            namespace='')
-
     def _get_values(self):
         return {
             'hostname': socket.getfqdn(),
-            'kernel_version': self._get_cmd_data(
-                cmd=['uname', '-r'],
-                firstline=True,as_lines=False)
+            'kernel_version': self._get_kernel(),
+            'loadavg': self._get_loadavg(),
+            'uptime': self._get_uptime(),
         }
 
 register_collector_class(HostInfo)
