@@ -45,14 +45,15 @@ class MqttListener():
         #if rest == 'node_state':
         #    remove host
         with self._lock:
-            if clsname == 'node_state' and sdata == 'offline':
+            data = json.loads(sdata)
+            if clsname == 'NodeInfo' and data['state'] == 'offline':
                 # we do not keep any data from offline hosts
                 del self._hosts[host]
             else:
                 if host not in self._hosts:
                     self._hosts[host] = {}
 
-                self._hosts[host][clsname] = json.loads(sdata)
+                self._hosts[host][clsname] = data
         
 
     def get_host_list(self):

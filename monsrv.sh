@@ -1,3 +1,3 @@
 #!/bin/sh
 
-FLASK_APP=monsrv pipenv run flask run
+FLASK_ENV=development FLASK_APP=monsrv pipenv run flask run

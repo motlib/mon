@@ -1,15 +1,8 @@
 import math
 
-# Map a value between 0 and 1 to a color between red and green.
-def get_css_color(val, cmap):
-    col = get_color_mapping(val, cmap)
-    
-    return "rgb({0}, {1}, {2})".format(*col)
-
-
 
 # Color map going from green over orange to red.
-red_green_map = (
+_red_green_map = (
     (0, 200, 0),  # green
     (255,220, 0), # orange
     (255, 0, 0)   # red
@@ -23,7 +16,11 @@ red_green_map = (
 # be supplied in the map parameter as an array of RGB vectors.
 #
 # @returns An array with red, green, blue components.
-def get_color_mapping(val, cmap=red_green_map):
+def get_color_mapping(val, minval=0.0, maxval=1.0, cmap=_red_green_map):
+
+    # map range to [0.0, 1.0]
+    val = (val - minval) / (maxval - minval)
+    
     # Limit input to range [0, 1]. 
     val = max(0.0, min(1.0, val))
 
@@ -57,14 +54,20 @@ def get_color_mapping(val, cmap=red_green_map):
     return col
 
 
-# Return html to format text according to val mapped to a color.
-def get_html_color(text, val, format='{t}', tag='span', cmap=red_green_map):
-    style = 'color: {c};'.format(c=get_css_color(val, cmap))
-
-    fmt = '<{tag} style="{style}">' + format + '</{tag}>'
+# Map a value between 0 and 1 to a color between red and green.
+def get_css_color(v, minval=0.0, maxval=1.0, cmap=_red_green_map):
+    col = get_color_mapping(val=v, minval=minval, maxval=maxval, cmap=cmap)
     
-    return fmt.format(
-        tag=tag,
-        t=text,
-        style=style)
+    return "rgb({0}, {1}, {2})".format(*col)
+
+
+# Return html to format text according to val mapped to a color.
+def get_html_color(v, minval=0.0, maxval=1.0, fmt='{v}', tag='span', cmap=_red_green_map):
+    css_col = get_css_color(v=v, cmap=cmap, minval=minval, maxval=maxval)
+    
+    style = 'color: {c};'.format(c=css_col)
+
+    fmt = '<{tag} style="{style}">{fmt}</{tag}>'.format(**locals())
+    
+    return fmt.format(v=v)
 
