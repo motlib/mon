@@ -71,7 +71,8 @@ def main():
         create_all=args.all_collectors)
 
     mqtt_pub = MqttPublisher(
-        cfg=config['global']
+        cfg=config['global'],
+        verbose=args.verbose
     )
 
     def pub_collector_values(col):

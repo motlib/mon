@@ -7,9 +7,11 @@ import paho.mqtt.client as mqtt
 
 
 class MqttPublisher():
-    def __init__(self, cfg):
+    def __init__(self, cfg, verbose=False):
         self._cfg = cfg
+        self._verbose = verbose
 
+        # we use the configured prefix plus our FQDN as the root topic. 
         self._prefix = cfg['prefix'] + '/' + socket.getfqdn() + '/'
         
         self.client = mqtt.Client()
@@ -55,8 +57,9 @@ class MqttPublisher():
             
             payload = json.dumps(data)
             self.client.publish(topic, payload, retain=True)
-            
-            print(topic, ':', payload)
+
+            msg = 'MQTT public to {topic}: {payload}'
+            logging.debug(msg.format(**locals()))
         except Exception as e:
             logging.exception("Failed to publish data from {0} collector.".format(col.__class__.__name__))
             
