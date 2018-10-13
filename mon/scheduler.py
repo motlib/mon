@@ -4,6 +4,9 @@ from time import sleep
 
 class Scheduler():
     def __init__(self, tasks, work_fct):
+        if len(tasks) == 0:
+            raise ValueError('Cannot work on empty task list.')
+        
         self._tasks = tasks
         self._work_fct = work_fct
 
