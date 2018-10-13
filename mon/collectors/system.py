@@ -106,7 +106,7 @@ class MemoryInfo(CollectorBase):
             data['totalUsed'] - meminfo['Buffers'] - data['cached'])
 
         # Percent of memory used.
-        data['pctInUse'] = float(data['inUse']) / meminfo['MemTotal']
+        data['pctInUse'] = float(data['inUse']) / meminfo['MemTotal'] * 100
         
         return data
 
