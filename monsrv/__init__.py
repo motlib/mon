@@ -4,14 +4,15 @@ import logging
 from flask import Flask, render_template, Response
 from jinja2.exceptions import TemplateNotFound
 
-from mqtt_listener import MqttListener
-from style import get_html_color, get_css_color
+from .mqtt_listener import MqttListener
+from .style import get_html_color, get_css_color
 
 app = Flask(__name__)
 app.jinja_env.globals.update(html_color=get_html_color, css_color=get_css_color)
 port = 5000
 
-mqttl = None
+cfg = {'broker': 'opi2', 'port': 1883, 'base_topic': 'mon'}
+mqttl = MqttListener(cfg)
 
 
 @app.route('/')
@@ -19,6 +20,7 @@ def host_list():
     hosts = mqttl.get_host_list()
 
     return render_template('hosts.html', hosts=hosts)
+
 
 @app.route('/hostinfo/<host>')
 def host_info(host):
@@ -47,11 +49,3 @@ def raw_host_info(host):
     data = mqttl.get_host_data(host)
 
     return Response(json.dumps(data), mimetype='application/json')
-
-
-if __name__ == '__main__':
-    cfg = {'broker': 'opi2', 'port': 1883, 'base_topic': 'mon'}
-    mqttl = MqttListener(cfg)
-
-    app.run(host='0.0.0.0', port=port, debug=True)
-    

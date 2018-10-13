@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pipenv run python mon
+FLASK_APP=monsrv pipenv run flask run
