@@ -4,12 +4,15 @@
 #"11142"
 #"1.0.0.1#53 16643 124" "8.8.4.4#53 33564 393" "1.1.1.1#53 15075 169" "8.8.8.8#53 51897 851"
 
+from datetime import datetime
+
 from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
 
+
 DNSMASQ_HOST='@localhost'
 
-class DnsMasqInfo(CollectorBase):
+class DnsMasqDnsInfo(CollectorBase):
     def __init__(self, cfg):
         super().__init__(
             cfg=cfg,
@@ -65,4 +68,38 @@ class DnsMasqInfo(CollectorBase):
         
         return data
 
-register_collector_class(DnsMasqInfo)
+register_collector_class(DnsMasqDnsInfo)
+
+
+class DnsMasqDhcpInfo(CollectorBase):
+    def __init__(self, cfg):
+        super().__init__(
+            cfg=cfg,
+            interval=60)
+
+        
+    def check(self):
+        data = self._get_file_data('/var/lib/misc/dnsmasq.leases', as_lines=True)
+
+
+    def get_values(self):
+        #1539513512 02:42:a0:15:a2:c3 192.168.0.111 opi1 *
+
+        data = self._get_file_data('/var/lib/misc/dnsmasq.leases', as_lines=True)
+
+        leases = []
+        
+        for line in data:
+            fields = line.split()
+            lease = {
+                'expiration': datetime.fromtimestamp(int(field[0])),
+                'hostname': fields[3],
+                'ip': fields[2],
+                'mac': fields[1],
+            }
+
+            leases.append(lease)
+
+        return {'leases': leases}
+
+register_collector_class(DnsMasqDhcpInfo)

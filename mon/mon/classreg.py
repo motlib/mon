@@ -1,3 +1,5 @@
+'''Class registry for data collectors.'''
+
 import logging
 
 
@@ -5,9 +7,11 @@ _classes = {}
 
 
 def register_collector_class(cls):
-    '''Register a collector class, so it can later be instanciated.'''
+    '''Register a collector class, so it can later be instanciated.
+
+    :param cls: The class to register.'''
     
-    clsname = cls.__module__ + '.' + cls.__name__
+    clsname = '.'.join((cls.__module__, cls.__name__))
     _classes[clsname] = cls
 
     msg = "Registered collector class '{clsname}'."
@@ -15,10 +19,16 @@ def register_collector_class(cls):
 
     
 def _create__instance(clsname, **params):
-    '''Create instance of a collector class.'''
+    '''Create instance of a collector class.
+
+    :param clsname: The class name to instanciate.
+    :param params: And further parameters to pass to the constructor.
+
+    :return: The new instance.
+    '''
     
     if clsname not in _classes:
-        raise KeyError('Requested collector class {0} not available.'.format(clsname))
+        raise KeyError('Collector class {0} not available.'.format(clsname))
 
     cls = _classes[clsname]
 
@@ -26,7 +36,15 @@ def _create__instance(clsname, **params):
 
 
 def create_collectors(colcfg, create_all=False):
-    '''Create collector instances according to configuration.'''
+    '''Create collector instances according to configuration. If a collector 
+    raises an Exception during instanciation, it is not included in the returned 
+    list.
+
+    :param colcfg: The collector configurations.
+    :param create_all: If set to True, all available collectors are created, 
+        even if not specified in the configuration.
+
+    :return: A list with all instanciated collectors.'''
     
     collectors = []
 
