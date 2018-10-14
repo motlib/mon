@@ -42,7 +42,14 @@ def fmt_sig(num, sig=3):
     
     num = round(num)    
 
-    return (num * math.pow(10, (l - sig)))
+    fmt = '{0}'
+
+    num = num * math.pow(10, (l - sig))
+
+    # workaround to prevent floating point precision errors.
+    num = round(num, 10)
+    
+    return fmt.format(num)
 
  
 def fmt_bytes(b, sig = 3) :

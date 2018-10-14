@@ -1,0 +1,9 @@
+{% extends "items/itembase.html" %}
+
+{% block itemdata %}
+<p>
+  The cache ({{ item.cachesize items }}) had {{ item.hits }} hits and
+  {{item.misses }} misses. This is a hitrate of
+  <b>{{ html_color(item.hitrate_pct, minval=0, maxval=100, fmt='{v:.0f}%') | safe }}</b>
+</p>
+{% endblock %}

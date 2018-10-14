@@ -1,3 +1,4 @@
+
 import copy
 import json
 import threading
@@ -10,7 +11,11 @@ class MqttListener():
         self._cfg = cfg
         
         self.client = mqtt.Client()
-        #client.username_pw_set(username, password)
+
+        if 'user' in cfg and 'password' in cfg:
+            client.username_pw_set(
+                self._cfg['user'],
+                self._cfg['password'])
 
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
@@ -18,17 +23,21 @@ class MqttListener():
         self.client.connect(cfg['broker'], cfg['port'])
         self.client.loop_start()
 
+        # the database is a simple dict
         self._hosts = {}
 
         self._lock = threading.Lock()
 
         
     def on_connect(self, client, userdata, flags, rc):
+        '''On connect MQTT event handler'''
+        
         topic = self._cfg['base_topic'] + '/#'
         client.subscribe(topic)
 
 
     def on_message(self, client, userdata, msg):
+        '''On message MQTT event handler.'''
         try:
             # strip base topic and following '/'
             subtopic = msg.topic[len(self._cfg['base_topic']) + 1:]
@@ -42,8 +51,9 @@ class MqttListener():
 
 
     def _handle_message(self, host, clsname, sdata):
-        #if rest == 'node_state':
-        #    remove host
+        '''Put message to local in-memory database. Remove data if host goes
+        offline.'''
+        
         with self._lock:
             data = json.loads(sdata)
             if clsname == 'NodeInfo':
@@ -61,10 +71,14 @@ class MqttListener():
         
 
     def get_host_list(self):
+        '''Returns a list of all known hosts.'''
+        
         with self._lock:
-            return list(self._hosts.keys())
+            return list(sorted(self._hosts.keys()))
 
 
-    def get_host_data(self, host, key=None):
+    def get_host_data(self, host):
+        '''Returns all known data of a host.'''
+        
         with self._lock:
             return copy.deepcopy(self._hosts[host])
