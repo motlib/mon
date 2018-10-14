@@ -12,8 +12,7 @@ class CpuInfo(CollectorBase):
     def __init__(self, cfg):
         super().__init__(
             cfg=cfg,
-            interval=30,
-            namespace='cpu')
+            interval=30)
 
         
     def check(self):
@@ -39,7 +38,8 @@ class CpuInfo(CollectorBase):
                 data[m.group(1)] = m.group(2)
                 
         return data
-        
+
+    
     def _get_temperatures(self):
         pattern = '/sys/class/thermal/thermal_zone*/temp'
 

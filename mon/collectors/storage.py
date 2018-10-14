@@ -8,8 +8,7 @@ class StorageInfo(CollectorBase):
     def __init__(self, cfg):
         super().__init__(
             cfg=cfg,
-            interval=60,
-            namespace='storage')
+            interval=60)
 
 
     def _get_storage_info(self):

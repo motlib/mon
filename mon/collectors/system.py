@@ -8,8 +8,7 @@ class HostInfo(CollectorBase):
     def __init__(self, cfg):
         super().__init__(
             cfg=cfg,
-            interval=3600,
-            namespace='')
+            interval=3600)
 
         
     def _get_loadavg(self):
@@ -52,8 +51,7 @@ class MemoryInfo(CollectorBase):
     def __init__(self, cfg):
         super().__init__(
             cfg=cfg,
-            interval=20,
-            namespace='')
+            interval=20)
 
         
     def _get_meminfo(self):

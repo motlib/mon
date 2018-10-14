@@ -16,6 +16,8 @@ class MqttPublisher():
         
         self.client = mqtt.Client()
 
+        self.client.enable_logger(logging.getLogger())
+
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
         
@@ -23,6 +25,7 @@ class MqttPublisher():
         
         # starts its own thread to handle network i/o
         self.client.loop_start()
+        logging.info('Spawned mqtt publisher thread.')
 
         
     def _connect(self):
@@ -68,14 +71,14 @@ class MqttPublisher():
     def on_connect(self, mqttc, obj, flags, rc):
         # FIXME: should be using logging
         msg = 'MQTT client connected to broker (rc={rc})'        
-        print(msg.format(rc=rc))
+        logging.info(msg.format(rc=rc))
 
         # publish, that we are online now
-        self.publish_data(data={'node_state': 'online'})
+        #self.publish_data(data={'node_state': 'online'})
 
 
     def on_disconnect(self, mqttc, userdata, rc):
         # FIXME: should be using logging
         msg = 'MQTT client lost connection to broker (rc={rc})'        
-        print(msg.format(rc=rc))
+        logging.info(msg.format(rc=rc))
         

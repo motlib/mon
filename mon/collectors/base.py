@@ -4,7 +4,7 @@ from socket import getfqdn
 from subprocess import check_output
 
 class CollectorBase():
-    def __init__(self, cfg, interval=None, namespace=''):
+    def __init__(self, cfg, interval=None):
         self._cfg = cfg
 
         if 'interval' in cfg:
@@ -13,10 +13,6 @@ class CollectorBase():
             self._interval = interval
         else:
             self._interval = 30
-
-        if namespace != '' and not namespace.endswith('/'):
-            namespace += '/'
-        self._ns = namespace
             
         self._next_run = datetime.now()
 
@@ -45,11 +41,7 @@ class CollectorBase():
     
     def get_data(self):
         topic = self._cfg.get('topic', self.__class__.__name__)
-
         values = self._get_values()
-
-        # prepend prefix to all value keys
-        #data = {self._ns + k: v for k,v in values.items()}
 
         self._next_run = (self._next_run + timedelta(seconds=self._interval))
         

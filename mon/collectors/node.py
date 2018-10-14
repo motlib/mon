@@ -6,8 +6,7 @@ class NodeInfo(CollectorBase):
     def __init__(self, cfg):
         super().__init__(
             cfg=cfg,
-            interval=3600,
-            namespace='storage')
+            interval=3600)
 
     def _get_info(self, state):
         return {
