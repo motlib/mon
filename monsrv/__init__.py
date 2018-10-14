@@ -36,7 +36,10 @@ def host_info(host):
         return abort(404)
 
     rendered_items = []
-    for key, item in data.items():
+    
+    # sort by class name until we have a better idea
+    for key in sorted(data.keys()):
+        item = data[key]
 
         try:
             tmpl = 'items/' + (item['_class'].split('.')[-1]) + '.html'
