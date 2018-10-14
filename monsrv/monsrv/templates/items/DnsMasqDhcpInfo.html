@@ -1,0 +1,20 @@
+{% extends "items/itembase.html" %}
+
+{% block itemdata %}
+<table class="datatable">
+  <tr>
+    <th>Hostname</th>
+    <th>MAC Address</th>
+    <th>IP Address</th>
+    <th>Exp. Time</th>
+  </tr>
+  {% for lease in item.leases|sort(attribute='hostname') %}
+  <tr>
+    <td>{{ lease.hostname }}</td>
+    <td>{{ lease.mac }}</td>
+    <td>{{ lease.ip }}</td>
+    <td>{{ lease.expiration }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
