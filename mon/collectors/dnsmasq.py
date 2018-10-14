@@ -25,7 +25,7 @@ class DnsMasqInfo(CollectorBase):
         ]
         data = self._get_cmd_data(cmd, as_lines=True)
         if len(data) != 1:
-            raise Exception("Dnsmasq does not provide statistics in the expected format.")
+            raise Exception("Dnsmasq does not provide statistics in the expected format. Output was: " + str(data))
 
         
     def _get_values(self):
