@@ -24,8 +24,8 @@ class DnsMasqInfo(CollectorBase):
             'cachesize.bind',
         ]
         data = self._get_cmd_data(cmd, as_lines=True)
-        if len(data) != 1:
-            raise Exception("Dnsmasq does not provide statistics in the expected format. Output was: " + str(data))
+        #if len(data) != 1:
+        #    raise Exception("Dnsmasq does not provide statistics in the expected format. Output was: " + str(data))
 
         
     def _get_values(self):
@@ -45,8 +45,8 @@ class DnsMasqInfo(CollectorBase):
         ]
         data = self._get_cmd_data(cmd, as_lines=True)
 
-        if len(data) != 7:
-            raise Exception("Unexpected command output.")
+        #if len(data) != 7:
+        #    raise Exception("Unexpected command output.")
 
         data = {
             'cachesize': int(line[0].replace('"', '')),
