@@ -73,6 +73,6 @@ class CollectorBase():
             return output.split('\n')[0]
         else:
             if as_lines:
-                return output.split('\n')
+                return output.strip().split('\n')
             else:
                 return output

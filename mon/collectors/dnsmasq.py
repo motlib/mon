@@ -7,6 +7,7 @@
 from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
 
+DNSMASQ_HOST='@localhost'
 
 class DnsMasqInfo(CollectorBase):
     def __init__(self, cfg):
@@ -19,20 +20,20 @@ class DnsMasqInfo(CollectorBase):
         cmd = [
             # main dig command
             'dig', '+short', 'chaos', 'txt', '+tries=1', '+timeout=2',
-            '@localhost', 
+            DNSMASQ_HOST, 
             # dnsmasq statistics to query
             'cachesize.bind',
         ]
         data = self._get_cmd_data(cmd, as_lines=True)
-        #if len(data) != 1:
-        #    raise Exception("Dnsmasq does not provide statistics in the expected format. Output was: " + str(data))
+        if len(data) != 1:
+            raise Exception("Dnsmasq does not provide statistics in the expected format. Output was: " + str(data))
 
         
     def _get_values(self):
         cmd = [
             # main dig command
             'dig', '+short', 'chaos', 'txt', '+tries=1', '+timeout=2',
-            '@localhost', 
+            DNSMASQ_HOST, 
             # dnsmasq statistics to query
             'cachesize.bind',
             'insertions.bind',
@@ -43,18 +44,18 @@ class DnsMasqInfo(CollectorBase):
             # servers info does not yet get evaluated
             #'servers.bind'
         ]
-        data = self._get_cmd_data(cmd, as_lines=True)
+        lines = self._get_cmd_data(cmd, as_lines=True)
 
         #if len(data) != 7:
         #    raise Exception("Unexpected command output.")
 
         data = {
-            'cachesize': int(line[0].replace('"', '')),
-            'insertions': int(line[1].replace('"', '')),
-            'evictions': int(line[2].replace('"', '')),
-            'misses': int(line[3].replace('"', '')),
-            'hits': int(line[4].replace('"', '')),
-            'auth': int(line[5].replace('"', '')),
+            'cachesize': int(lines[0].replace('"', '')),
+            'insertions': int(lines[1].replace('"', '')),
+            'evictions': int(lines[2].replace('"', '')),
+            'misses': int(lines[3].replace('"', '')),
+            'hits': int(lines[4].replace('"', '')),
+            'auth': int(lines[5].replace('"', '')),
         }
         
         return data
