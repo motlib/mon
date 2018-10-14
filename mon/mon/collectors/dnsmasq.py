@@ -82,8 +82,9 @@ class DnsMasqDhcpInfo(CollectorBase):
         data = self._get_file_data('/var/lib/misc/dnsmasq.leases', as_lines=True)
 
 
-    def get_values(self):
-        #1539513512 02:42:a0:15:a2:c3 192.168.0.111 opi1 *
+    def _get_values(self):
+        # example line
+        # 1539513512 02:42:a0:15:a2:c3 192.168.0.111 opi1 *
 
         data = self._get_file_data('/var/lib/misc/dnsmasq.leases', as_lines=True)
 
