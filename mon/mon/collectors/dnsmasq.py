@@ -93,7 +93,7 @@ class DnsMasqDhcpInfo(CollectorBase):
         for line in data:
             fields = line.split()
             lease = {
-                'expiration': datetime.fromtimestamp(int(field[0])),
+                'expiration': datetime.fromtimestamp(int(fields[0])),
                 'hostname': fields[3],
                 'ip': fields[2],
                 'mac': fields[1],
