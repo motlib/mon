@@ -3,7 +3,10 @@
 {% block title %}{{ host }}{% endblock %}
 
 {% block content %}
-<p><a href="{{ url_for('host_list') }}">Host List</a></p>
+<p>
+  <a href="{{ url_for('host_list') }}">Host List</a>
+  <a href="{{ url_for('raw_host_info', host=host) }}">Raw Data</a>
+</p>
 
 
 {% for ri in rendered_items %}

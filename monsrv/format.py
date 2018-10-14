@@ -5,18 +5,19 @@ def fmt_date_interval(seconds):
     '''Format output of a time interval specified in seconds. '''
 
     values = (
-        ('weeks', 7*24*60*60),
-        ('days', 24*60*60),
-        ('hours', 60*60),
-        ('minutes', 60),
-        ('seconds', 1),
+        ('week', 7*24*60*60),
+        ('day', 24*60*60),
+        ('hour', 60*60),
+        ('minute', 60),
+        ('second', 1),
     )
 
     result = []
     for u,v in values:
         if seconds >= v:
             w = seconds // v
-            result.append('{w:.0f} {u}'.format(w=w,u=u))
+            plural_s = 's' if w > 1 else ''
+            result.append('{w:.0f} {u}{plural_s}'.format(w=w,u=u,plural_s=plural_s))
             seconds -= (w * v)
 
     
