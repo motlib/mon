@@ -57,6 +57,11 @@ class DnsMasqInfo(CollectorBase):
             'hits': int(lines[4].replace('"', '')),
             'auth': int(lines[5].replace('"', '')),
         }
+
+        if data['hits'] + data['misses'] != 0:
+            data['hitrate_pct'] = float(data['hits']) / (data['hits'] + data['misses']) * 100
+        else:
+            data['hitrate_pct'] = 0.0
         
         return data
 
