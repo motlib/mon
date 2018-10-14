@@ -40,10 +40,13 @@ class CollectorBase():
 
     
     def get_data(self):
+        # first update next run time. If _get_values fails, the time still is
+        # updated correctly.
+        self._next_run = (self._next_run + timedelta(seconds=self._interval))
+
         topic = self._cfg.get('topic', self.__class__.__name__)
         values = self._get_values()
 
-        self._next_run = (self._next_run + timedelta(seconds=self._interval))
         
         return (topic, values)
 
