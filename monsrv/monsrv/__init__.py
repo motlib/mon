@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import datetime
 
 from flask import Flask, render_template, Response, abort
 from jinja2.exceptions import TemplateNotFound
@@ -41,6 +42,13 @@ def host_info(host):
     for key in sorted(data.keys()):
         item = data[key]
 
+        try:
+            age = (datetime.utcnow() - datetime.fromtimestamp(int(item['_timestamp']))).total_seconds()
+        except:
+            age=0
+
+        item['_age'] = age
+        item['_next_update'] = int(item['_interval']) - age
         try:
             tmpl = 'items/' + (item['_class'].split('.')[-1]) + '.html'
             itemhtml = render_template(tmpl, key=key, item=item)

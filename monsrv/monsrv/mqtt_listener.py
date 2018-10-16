@@ -1,3 +1,5 @@
+'''Component to listen to MQTT messages and put them to its in-memory
+database.'''
 
 import copy
 import json
@@ -53,9 +55,12 @@ class MqttListener():
     def _handle_message(self, host, clsname, sdata):
         '''Put message to local in-memory database. Remove data if host goes
         offline.'''
+
+        data = json.loads(sdata)
+
+        #t = data['_timestamp']
         
         with self._lock:
-            data = json.loads(sdata)
             if clsname == 'NodeInfo':
                 if data['state'] == 'offline':
                 # we do not keep any data from offline hosts

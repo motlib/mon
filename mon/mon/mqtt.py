@@ -44,11 +44,7 @@ class MqttPublisher():
         
     def _prepare_data(self, col):
         topic, data = col.get_data()
-    
-        data['_class'] = col.__module__ + '.' + col.__class__.__name__
-        data['_timestamp'] = datetime.now().isoformat()
-        data['_interval'] = col.get_interval()
-        
+            
         topic = self._prefix + topic
 
         return (topic, data)

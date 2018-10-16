@@ -1,17 +1,23 @@
 <div class="toolbox" id="tb_{{ key }}">
-  <h2 class="heading"
+  <div class="heading"
       id="head_{{ key }}"
       onclick="toggle_content(this);">
-    <span id="tglind_{{ key }}">
-      [-]
+    <span style="font-weight: bold">
+      <span id="tglind_{{ key }}">
+        [-]
+      </span>
+      {% block itemhead %}{{ key }}{% endblock %}
     </span>
-    {% block itemhead %}{{ key }}{% endblock %}
-  </h2>
+    <span style="font-size:x-small;">
+      age: {{ "%.0f" | format(item._age) }}s,
+      next upd: {{ "%.0f" | format(item._next_update) }}s
+    </span>
+
+  </div>
 
   <div class="content"
        id="content_{{ key }}"
        style="display:block">
     {% block itemdata %}{% endblock %}
-    {#<pre style="font-size:x-small">{{ item | pprint }}</pre>#}
   </div>
 </div>
