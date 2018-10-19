@@ -51,12 +51,12 @@ class HostapdInfo(CollectorBase):
         sdata = None
         all_data = []
         for line in lines:
-            m = self._sta_pattern.match(line)
+            m = self._sta_pattern_c.match(line)
             if m:
                 sdata = {'address': m.group(0)}
                 all_data.append(sdata)
 
-            m = self._data_pattern.match(line)
+            m = self._data_pattern_c.match(line)
             if sdata and m:
                 sdata[m.group(1)] = m.group(2)
 
