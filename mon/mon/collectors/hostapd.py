@@ -4,16 +4,24 @@ from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
 
 
+
 class HostapdInfo(CollectorBase):
     def __init__(self, cfg):
         super().__init__(
             cfg=cfg,
             interval=60)
 
+        self._sta_pattern = r'^[a-f0-9]{2}(:[a-f0-9]{2}){5}$'
+        self._sta_pattern_c = re.compile(self._sta_pattern)
+
+        self._data_pattern = r'^(.*?)=(.*)$'
+        self._data_pattern_c = re.compile(self._data_pattern)
+
 
     def check(self):
+        pass
         # let's try to run hostapp_cli
-        self._get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
+        #self._get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
         
 # Selected interface 'wlan0'
 # 10:41:7f:da:d0:85
@@ -43,12 +51,12 @@ class HostapdInfo(CollectorBase):
         sdata = None
         all_data = []
         for line in lines:
-            m = re.match(r'^([a-f0-9](:[a-f0-9]){5})$', line)
+            m = self._sta_pattern.match(line)
             if m:
-                sdata = {'address': m.group(1)}
+                sdata = {'address': m.group(0)}
                 all_data.append(sdata)
 
-            m = re.match(r'^(.*?)=(.*)$', line)
+            m = self._data_pattern.match(line)
             if sdata and m:
                 sdata[m.group(1)] = m.group(2)
 
