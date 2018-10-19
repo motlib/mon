@@ -60,8 +60,23 @@ class HostapdInfo(CollectorBase):
             if sdata and m:
                 sdata[m.group(1)] = m.group(2)
 
+        # fix data type of some integer values
+        int_keys = (
+            'rx_packets',
+            'tx_packets',
+            'rx_bytes',
+            'tx_bytes',
+            'connected_time'
+        )
+        
+        for sta in all_data:
+            for k in int_keys:
+                sta[k] = int(sta[k])
+                
         return all_data
 
+    
+    
         
     def _get_values(self):
         return {
