@@ -1,0 +1,64 @@
+import re
+
+from mon.classreg import register_collector_class
+from mon.collectors.base import CollectorBase
+
+
+class HostapdInfo(CollectorBase):
+    def __init__(self, cfg):
+        super().__init__(
+            cfg=cfg,
+            interval=60)
+
+
+    def check(self):
+        # let's try to run hostapp_cli
+        self._get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
+        
+# Selected interface 'wlan0'
+# 10:41:7f:da:d0:85
+# flags=[AUTH][ASSOC][AUTHORIZED][SHORT_PREAMBLE][WMM]
+# aid=2
+# capability=0x431
+# listen_interval=20
+# supported_rates=82 84 8b 96 24 30 48 6c 0c 12 18 60
+# timeout_next=NULLFUNC POLL
+# dot11RSNAStatsSTAAddress=10:41:7f:da:d0:85
+# dot11RSNAStatsVersion=1
+# dot11RSNAStatsSelectedPairwiseCipher=00-0f-ac-4
+# dot11RSNAStatsTKIPLocalMICFailures=0
+# dot11RSNAStatsTKIPRemoteMICFailures=0
+# hostapdWPAPTKState=11
+# hostapdWPAPTKGroupState=0
+# rx_packets=231
+# tx_packets=160
+# rx_bytes=29119
+# tx_bytes=118030
+# connected_time=5
+        
+    def _get_station_info(self):
+        lines = self._get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
+
+        addr = None
+        sdata = None
+        all_data = []
+        for line in lines:
+            m = re.match(r'^([a-f0-9](:[a-f0-9]){5})$', line)
+            if m:
+                sdata = {'address': m.group(1)}
+                all_data.append(sdata)
+
+            m = re.match(r'^(.*?)=(.*)$', line)
+            if sdata and m:
+                sdata[m.group(1)] = m.group(2)
+
+        return all_data
+
+        
+    def _get_values(self):
+        return {
+            'stations': self._get_station_info(),
+        }
+
+    
+register_collector_class(HostapdInfo)
