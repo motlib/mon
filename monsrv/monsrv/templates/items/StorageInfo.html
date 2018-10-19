@@ -6,7 +6,7 @@
   The {{ fs.type }} filesystem at
   {{ fs.mount_point }} uses
   {{ fmt_bytes(fs.used * 1024) }}
-  ({{ html_color(fs.used_pct, minval=0, maxval=100, fmt='{v:.1f}%') | safe }})
+  (<b>{{ html_color(fs.used_pct, minval=0, maxval=100, fmt='{v:.1f}%') | safe }}</b>)
   of {{ fmt_bytes(fs.size * 1024) }}.
 </p>
 {% endfor %}

@@ -44,6 +44,7 @@ def host_info(host):
 
         try:
             age = (datetime.utcnow() - datetime.fromtimestamp(int(item['_timestamp']))).total_seconds()
+            age = max(age, 0)
         except:
             age=0
 
@@ -60,8 +61,7 @@ def host_info(host):
             
         except Exception as e:
             # other errors are currently just ignored
-            print(item)
-            logging.exception(e)
+            logging.exception("Failed to render item '{item}'.".format(item))
             continue
     
     return render_template('hostinfo.html', host=host, data=data, rendered_items=rendered_items)
