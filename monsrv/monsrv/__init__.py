@@ -6,17 +6,10 @@ from flask import Flask, render_template, Response, abort
 from jinja2.exceptions import TemplateNotFound
 
 from .mqtt_listener import MqttListener
-from .style import get_html_color, get_css_color
-from .format import fmt_bytes, fmt_sig, fmt_date_interval
 
-app = Flask(__name__)
-app.jinja_env.globals.update(
-    html_color=get_html_color,
-    css_color=get_css_color,
-    fmt_bytes=fmt_bytes,
-    fmt_sig=fmt_sig,
-    fmt_date_interval=fmt_date_interval)
+from monsrv.factory import create_app
 
+app = create_app()
 
 cfg = {'broker': 'opi2', 'port': 1883, 'base_topic': 'mon'}
 mqttl = MqttListener(cfg)
