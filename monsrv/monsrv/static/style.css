@@ -2,10 +2,17 @@ body {
     font-family: Calibri, sans-serif;
     color: black;
     background-color: white;
+
+    font-size: 8pt;
 }
 
 h1 {
     font-size: 10pt;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 9pt;
     font-weight: bold;
 }
 
@@ -29,23 +36,34 @@ p.devinfo {
     font-size: 8pt;
     background-color: lightgray;
     padding: 2px;
-    margin: 0;
-    
+    margin: 0;    
 }
+
+.toolbox .heading .tglind {
+    font-weight: bold;
+}
+
+.toolbox .heading .title {
+    font-weight: bold;
+}
+
+.toolbox .heading .title {
+}
+
 
 .toolbox .heading:hover {
     cursor: pointer;
 }
 
 .toolbox:hover {
-    border-color: gray;
+    border-color: blue;
 }
 
 .toolbox .content {
     padding: 2pt
 }
 
-.toolbox .content  pre {
+.toolbox .content pre {
     margin: 0;
     overflow: auto;
 }

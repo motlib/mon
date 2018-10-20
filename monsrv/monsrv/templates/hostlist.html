@@ -3,11 +3,12 @@
 {% block title %}Host List{% endblock %}
 
 {% block content %}
+{#
 <table class="datatable">
   <tr>
     <th>Class Name</th>
   </tr>
-  {% for cls in classes %}
+  {% for cls in classes | sort%}
   <tr>
     <td>
       <a href="{{ url_for('class_info', clsname=cls) }}">{{ cls }}</a>
@@ -15,13 +16,23 @@
   </tr>
   {% endfor %}
 </table>
+#}
 
-<table class="datatable">
+<h2>View By Class</h2>
+<p>
+  {% for cls in classes | sort%}
+  <a href="{{ url_for('class_info', clsname=cls) }}">{{ cls }}</a>
+  {% endfor %}
+</p>
+
+
+
+<table class="datatable" style="margin:5px">
   <tr>
     <th>Hostname</th>
     <th>Raw Data</th>
   </tr>
-  {% for host in hosts %}
+  {% for host in hosts | sort%}
   <tr>
     <td>
       <a href="{{ url_for('host_info', host=host) }}">{{ host }}</a>

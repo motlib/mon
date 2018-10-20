@@ -1,13 +1,18 @@
+
+/* Function to return a single element by xpath expression. */
+var get_element = function(root, exp) {
+    return document.evaluate(
+        exp,
+        root,
+        null,
+        XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+}
+
 /* Function to expand / collape a toolbox when clicking the toolbox
  * heading. */
 var toggle_content = function(el_h) {
-    // heading id is head_script, so script name starts at char 5
-    var key = el_h.id.substring(5);
-    
-    /* Get content area div tag */
-    var el_content = document.getElementById('content_' + key);
-    /* Get toggle indicator span tag */
-    var el_tglind = document.getElementById('tglind_' + key);
+    var el_content = get_element(el_h, "../div[@class='content']")
+    var el_tglind = get_element(el_h, "span[@class='tglind']")
 
     if(el_content.style.display == 'none') {
         el_content.style.display = 'block';

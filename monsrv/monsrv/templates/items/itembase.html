@@ -2,13 +2,13 @@
   <div class="heading"
       id="head_{{ key }}"
       onclick="toggle_content(this);">
-    <span style="font-weight: bold">
-      <span id="tglind_{{ key }}">
-        [-]
-      </span>
-      {% block itemhead %}{{ item._class }}@{{ host }}{% endblock %}
+    <span class="tglind" id="tglind_{{ key }}">
+      [-]
     </span>
-    <span style="font-size:x-small;">
+    <span class="title">
+    {% block itemhead %}{{ item._class }}@{{ host }}{% endblock %}
+    </span>
+    <span class="info">
       age: {{ "%.0f" | format(item._age) }}s,
       next upd: {{ "%.0f" | format(item._next_update) }}s
     </span>
