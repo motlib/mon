@@ -13,7 +13,7 @@
     <td>{{ sta.address }}</td>
     <td>{{ fmt_bytes(sta.rx_bytes) }}</td>
     <td>{{ fmt_bytes(sta.tx_bytes) }}</td>
-    <td>{{ sta.connected_time }}s</td>
+    <td>{{ fmt_date_interval(sta.connected_time) }}</td>
   </tr>
   {% endfor %}
 </table>

@@ -5,20 +5,22 @@
   The CPU ({{ item.architecture }}) has {{ item.cores }} cores. 
 
   {% if item.zone_temperatures|length > 0 %}
-  Zone temperatures are
+  Zone temperatures:
   {% for t in item.zone_temperatures %}
   <b>{{ html_color(t, minval=10, maxval=80, fmt='{v:.1f}°C') | safe }}</b>
   {% endfor %}
   {% endif %}
+</p>
 
-  {% if item.min_frequency and item.max_frequency and item.frequency%}
+{% if item.min_frequency and item.max_frequency and item.frequency%}
+<p>
   Frequency range
   {{ "%.0f"|format(item.min_frequency) }}
   to
   {{ "%.0f"|format(item.max_frequency) }} MHz.
   Current frequency: <b>{{ html_color(item.frequency, minval=item.min_frequency,
   maxval=item.max_frequency, fmt='{v:.0f}MHz') | safe}}</b>
-  {% endif %}
-  
 </p>
+{% endif %}
+  
 {% endblock %}

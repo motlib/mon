@@ -19,32 +19,32 @@ class HostapdInfo(CollectorBase):
 
 
     def check(self):
-        pass
         # let's try to run hostapp_cli
-        #self._get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
-        
-# Selected interface 'wlan0'
-# 10:41:7f:da:d0:85
-# flags=[AUTH][ASSOC][AUTHORIZED][SHORT_PREAMBLE][WMM]
-# aid=2
-# capability=0x431
-# listen_interval=20
-# supported_rates=82 84 8b 96 24 30 48 6c 0c 12 18 60
-# timeout_next=NULLFUNC POLL
-# dot11RSNAStatsSTAAddress=10:41:7f:da:d0:85
-# dot11RSNAStatsVersion=1
-# dot11RSNAStatsSelectedPairwiseCipher=00-0f-ac-4
-# dot11RSNAStatsTKIPLocalMICFailures=0
-# dot11RSNAStatsTKIPRemoteMICFailures=0
-# hostapdWPAPTKState=11
-# hostapdWPAPTKGroupState=0
-# rx_packets=231
-# tx_packets=160
-# rx_bytes=29119
-# tx_bytes=118030
-# connected_time=5
+        self._get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
+
         
     def _get_station_info(self):
+        # Example output:
+        # 10:41:7f:da:d0:85
+        # flags=[AUTH][ASSOC][AUTHORIZED][SHORT_PREAMBLE][WMM]
+        # aid=2
+        # capability=0x431
+        # listen_interval=20
+        # supported_rates=82 84 8b 96 24 30 48 6c 0c 12 18 60
+        # timeout_next=NULLFUNC POLL
+        # dot11RSNAStatsSTAAddress=10:41:7f:da:d0:85
+        # dot11RSNAStatsVersion=1
+        # dot11RSNAStatsSelectedPairwiseCipher=00-0f-ac-4
+        # dot11RSNAStatsTKIPLocalMICFailures=0
+        # dot11RSNAStatsTKIPRemoteMICFailures=0
+        # hostapdWPAPTKState=11
+        # hostapdWPAPTKGroupState=0
+        # rx_packets=231
+        # tx_packets=160
+        # rx_bytes=29119
+        # tx_bytes=118030
+        # connected_time=5
+        
         lines = self._get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
 
         addr = None
