@@ -6,7 +6,7 @@
       <span id="tglind_{{ key }}">
         [-]
       </span>
-      {% block itemhead %}{{ key }}{% endblock %}
+      {% block itemhead %}{{ item._class }}@{{ host }}{% endblock %}
     </span>
     <span style="font-size:x-small;">
       age: {{ "%.0f" | format(item._age) }}s,

@@ -25,9 +25,62 @@ mqttl = MqttListener(cfg)
 @app.route('/')
 def host_list():
     hosts = mqttl.get_host_list()
+    classes = mqttl.get_classes()
 
-    return render_template('hosts.html', hosts=hosts)
+    return render_template('hostlist.html', hosts=hosts, classes=classes)
 
+
+def render_item(host, item):
+    try:
+        age = (datetime.utcnow() - datetime.fromtimestamp(int(item['_timestamp']))).total_seconds()
+        age = max(age, 0)
+    except:
+        age=0
+
+    item['_age'] = age
+    item['_next_update'] = int(item['_interval']) - age
+    
+    try:
+        tmpl = 'items/{clsname}.html'.format(clsname=item['_class'])
+        itemhtml = render_template(tmpl, host=host, item=item)
+        return itemhtml
+        
+    except TemplateNotFound as e:
+        itemhtml = render_template('items/PreItem.html', host=host, item=item)
+        return itemhtml
+        
+    except Exception as e:
+        # other errors are currently just ignored
+        msg = "Failed to render item '{item}'."
+        logging.exception(msg.format(
+            item=item))
+
+        return None
+    
+
+@app.route('/clsinfo/<clsname>')
+def class_info(clsname):
+    data = mqttl.get_class_data(clsname)
+
+    print(data)
+    
+    rendered_items = []
+    
+    # sort by class name until we have a better idea
+    for host in sorted(data.keys()):
+        item = data[host]
+
+        html = render_item(host, item)
+        if html != None:
+            rendered_items.append(html)
+
+    return render_template(
+        'clsinfo.html',
+        clsname=clsname,
+        data=data,
+        rendered_items=rendered_items)
+    
+    
 
 @app.route('/hostinfo/<host>')
 def host_info(host):
@@ -42,29 +95,15 @@ def host_info(host):
     for key in sorted(data.keys()):
         item = data[key]
 
-        try:
-            age = (datetime.utcnow() - datetime.fromtimestamp(int(item['_timestamp']))).total_seconds()
-            age = max(age, 0)
-        except:
-            age=0
+        html = render_item(host, item)
+        if html != None:
+            rendered_items.append(html)
 
-        item['_age'] = age
-        item['_next_update'] = int(item['_interval']) - age
-        try:
-            tmpl = 'items/' + (item['_class'].split('.')[-1]) + '.html'
-            itemhtml = render_template(tmpl, key=key, item=item)
-            rendered_items.append(itemhtml)
-            
-        except TemplateNotFound as e:
-            itemhtml = render_template('items/PreItem.html', key=key, item=item)
-            rendered_items.append(itemhtml)
-            
-        except Exception as e:
-            # other errors are currently just ignored
-            logging.exception("Failed to render item '{item}'.".format(item))
-            continue
-    
-    return render_template('hostinfo.html', host=host, data=data, rendered_items=rendered_items)
+    return render_template(
+        'hostinfo.html',
+        host=host,
+        data=data,
+        rendered_items=rendered_items)
 
 
 @app.route('/rawhostinfo/<host>')

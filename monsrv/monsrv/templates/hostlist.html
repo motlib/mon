@@ -1,0 +1,35 @@
+{% extends 'page.html' %}
+
+{% block title %}Host List{% endblock %}
+
+{% block content %}
+<table class="datatable">
+  <tr>
+    <th>Class Name</th>
+  </tr>
+  {% for cls in classes %}
+  <tr>
+    <td>
+      <a href="{{ url_for('class_info', clsname=cls) }}">{{ cls }}</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<table class="datatable">
+  <tr>
+    <th>Hostname</th>
+    <th>Raw Data</th>
+  </tr>
+  {% for host in hosts %}
+  <tr>
+    <td>
+      <a href="{{ url_for('host_info', host=host) }}">{{ host }}</a>
+    </td>
+    <td>
+      <a href="{{ url_for('raw_host_info', host=host) }}">raw</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

@@ -87,3 +87,37 @@ class MqttListener():
         
         with self._lock:
             return copy.deepcopy(self._hosts[host])
+
+
+    def get_class_data(self, clsname):
+        '''Return a dict of host -> data items where data items are of type classname.'''
+        
+        with self._lock:
+
+            data = {}
+
+            # FIXME: Currently a host can only have one item per class
+            #for host, hdata in self._hosts.items():
+            #    for v in hdata.values():
+            #        if v['_class'] == clsname:
+            #            data[host] = v
+            
+            data = {
+                host: v
+                for host, hdata in self._hosts.items()
+                for v in hdata.values()
+                if v['_class'] == clsname
+            }
+            
+            return data
+
+    def get_classes(self):
+        with self._lock:
+            classes = {
+                v['_class']
+                for hdata in self._hosts.values()
+                for v in hdata.values()
+            }
+
+            return classes
+        

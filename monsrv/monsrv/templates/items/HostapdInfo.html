@@ -1,0 +1,20 @@
+{% extends "items/itembase.html" %}
+
+{% block itemdata %}
+<table class="datatable">
+  <tr>
+    <th>MAC Address</th>
+    <th>RX Bytes</th>
+    <th>TX Bytes</th>
+    <th>Connected time</th>
+  </tr>
+  {% for sta in item.stations|sort(attribute='address') %}
+  <tr>
+    <td>{{ sta.address }}</td>
+    <td>{{ fmt_bytes(sta.rx_bytes) }}</td>
+    <td>{{ fmt_bytes(sta.tx_bytes) }}</td>
+    <td>{{ sta.connected_time }}s</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
