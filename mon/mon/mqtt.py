@@ -1,4 +1,3 @@
-from datetime import datetime
 import json
 import logging
 import socket
@@ -68,9 +67,6 @@ class MqttPublisher():
         
         msg = 'MQTT client connected to broker (rc={rc})'        
         logging.info(msg.format(rc=rc))
-
-        # publish, that we are online now
-        #self.publish_data(data={'node_state': 'online'})
 
 
     def on_disconnect(self, mqttc, userdata, rc):

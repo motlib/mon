@@ -49,9 +49,7 @@ class StorageInfo(CollectorBase):
 
         ignore_fstypes = self._cfg.get('ignore_fstypes', ['tmpfs', 'devtmpfs'])
 
-        stinfo = {s['mount_point']:s
-                  for s in stinfo
-                  if s['type'] not in ignore_fstypes}
+        stinfo = [s for s in stinfo if s['type'] not in ignore_fstypes]
 
         return {'filesystems': stinfo}
         

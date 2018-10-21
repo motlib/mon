@@ -1,7 +1,7 @@
 {% extends "items/itembase.html" %}
 
 {% block itemdata %}
-{% for n,fs in item.filesystems.items() %}
+{% for fs in item.filesystems | sort(attribute='mount_point') %}
 <p>
   The {{ fs.type }} filesystem at
   {{ fs.mount_point }} uses
