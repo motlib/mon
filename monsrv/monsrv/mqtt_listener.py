@@ -61,8 +61,6 @@ class MqttListener():
 
         data = json.loads(sdata.decode('utf-8'))
 
-        #t = data['_timestamp']
-        
         with self._lock:
             if clsname == 'NodeInfo':
                 if data['state'] == 'offline':

@@ -5,11 +5,11 @@ def fmt_date_interval(seconds):
     '''Format output of a time interval specified in seconds. '''
 
     values = (
-        ('week', 7*24*60*60),
-        ('day', 24*60*60),
-        ('hour', 60*60),
-        ('minute', 60),
-        ('second', 1),
+        ('week',   7*24*60*60),
+        ('day',      24*60*60),
+        ('hour',        60*60),
+        ('minute',         60),
+        ('second',          1),
     )
 
     result = []
@@ -19,8 +19,6 @@ def fmt_date_interval(seconds):
             plural_s = 's' if w > 1 else ''
             result.append('{w:.0f} {u}{plural_s}'.format(w=w,u=u,plural_s=plural_s))
             seconds -= (w * v)
-
-    
             
     return ', '.join(result)
 
@@ -66,17 +64,17 @@ def fmt_bytes(b, sig = 3) :
     
     b = abs(b)
     
-    sizes = {
-        'TB': math.pow(1024, 4),
-        'GB': math.pow(1024, 3),
-        'MB': math.pow(1024, 2),
-        'kB': math.pow(1024, 1),
+    sizes = (
+        ('TB', math.pow(1024, 4)),
+        ('GB', math.pow(1024, 3)),
+        ('MB', math.pow(1024, 2)),
+        ('kB', math.pow(1024, 1)),
     }
 
     fmt = "{v}{u}"
     
-    for u, r in sizes.items():
-        if(b >= r) :
+    for u, r in sizes:
+        if(b >= r):
             return fmt.format(v=fmt_sig(b / r, sig), u=u)
 
     return fmt.format(v=fmt_sig(bytes, sig), u='B')
