@@ -59,7 +59,7 @@ class MqttListener():
         '''Put message to local in-memory database. Remove data if host goes
         offline.'''
 
-        data = json.loads(sdata)
+        data = json.loads(sdata.decode('utf-8'))
 
         #t = data['_timestamp']
         
