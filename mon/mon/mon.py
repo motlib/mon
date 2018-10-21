@@ -76,9 +76,11 @@ def main():
     )
 
     scheduler = Scheduler(
-        tasks=collectors,
         work_fct=lambda col: mqtt_pub.publish_data(col))
 
+    for c in collectors:
+        scheduler.add_task(c, c.get_interval())
+    
     # run the scheduler until end of time
     logging.debug('Kicking off the scheduler.')
     scheduler.run()

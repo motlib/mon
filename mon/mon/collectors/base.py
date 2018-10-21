@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
-from socket import getfqdn
+
 
 class CollectorBase():
     def __init__(self, cfg, interval=None):
@@ -13,36 +13,23 @@ class CollectorBase():
         else:
             self._interval = 30
             
-        self._next_run = datetime.now()
 
         # this will raise exceptions, if the collector requirements are not
         # fullfilled.
         self.check()
 
+        
+    def get_interval(self):
+        return self._interval
+        
 
     def check(self):
         # this function can be overridden to check if all preconditions for this
         # collector are fullfilled to be used. E.g. check if commands are available
         pass
 
-        
-    def is_ready(self):
-        return self._next_run < datetime.now()
-
-    
-    def get_next_run(self):
-        return self._next_run
-
-    
-    def get_interval(self):
-        return self._interval
-
     
     def get_data(self):
-        # first update next run time. If _get_values fails, the time still is
-        # updated correctly.
-        self._next_run = (self._next_run + timedelta(seconds=self._interval))
-
         topic = self._cfg.get('topic', self.__class__.__name__)
         values = self._get_values()
 
