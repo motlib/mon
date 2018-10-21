@@ -2,7 +2,7 @@ import re
 
 from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
-
+from mon.utils import get_cmd_data
 
 
 class HostapdInfo(CollectorBase):
@@ -20,7 +20,7 @@ class HostapdInfo(CollectorBase):
 
     def check(self):
         # let's try to run hostapp_cli
-        self._get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
+        get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
 
         
     def _get_station_info(self):
@@ -45,7 +45,7 @@ class HostapdInfo(CollectorBase):
         # tx_bytes=118030
         # connected_time=5
         
-        lines = self._get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
+        lines = get_cmd_data(['hostapd_cli', 'all_sta'], as_lines=True)
 
         addr = None
         sdata = None
@@ -75,8 +75,6 @@ class HostapdInfo(CollectorBase):
                 
         return all_data
 
-    
-    
         
     def _get_values(self):
         return {

@@ -2,7 +2,7 @@ import json
 import logging
 from datetime import datetime
 
-from flask import Flask, render_template, Response, abort
+from flask import render_template, Response, abort
 from jinja2.exceptions import TemplateNotFound
 
 from .mqtt_listener import MqttListener
@@ -54,9 +54,6 @@ def render_item(host, item):
 @app.route('/clsinfo/<clsname>')
 def class_info(clsname):
     data = mqttl.get_class_data(clsname)
-
-    print(data)
-    
     rendered_items = []
     
     # sort by class name until we have a better idea
@@ -74,7 +71,6 @@ def class_info(clsname):
         rendered_items=rendered_items)
     
     
-
 @app.route('/hostinfo/<host>')
 def host_info(host):
     try:

@@ -3,6 +3,7 @@ import socket
 
 from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase    
+from mon.utils import get_file_data, get_cmd_data
 
 class HostInfo(CollectorBase):
     def __init__(self, cfg):
@@ -12,7 +13,7 @@ class HostInfo(CollectorBase):
 
         
     def _get_loadavg(self):
-        loaddata = self._get_file_data(
+        loaddata = get_file_data(
             filename='/proc/loadavg',
             firstline=True)
 
@@ -22,7 +23,7 @@ class HostInfo(CollectorBase):
 
     
     def _get_uptime(self):
-        data = self._get_file_data(
+        data = get_file_data(
             filename='/proc/uptime',
             firstline=True)
 
@@ -30,7 +31,7 @@ class HostInfo(CollectorBase):
 
 
     def _get_kernel(self):
-        return self._get_cmd_data(
+        return get_cmd_data(
             cmd=['uname', '-r'],
             firstline=True,
             as_lines=False)
@@ -55,7 +56,7 @@ class MemoryInfo(CollectorBase):
 
         
     def _get_meminfo(self):
-        lines = self._get_file_data(
+        lines = get_file_data(
             filename='/proc/meminfo').split('\n')
 
         meminfo = {}

@@ -75,12 +75,9 @@ def main():
         verbose=args.verbose
     )
 
-    def pub_collector_values(col):
-        mqtt_pub.publish_data(col)
-
     scheduler = Scheduler(
         tasks=collectors,
-        work_fct=pub_collector_values)
+        work_fct=lambda col: mqtt_pub.publish_data(col))
 
     # run the scheduler until end of time
     logging.debug('Kicking off the scheduler.')

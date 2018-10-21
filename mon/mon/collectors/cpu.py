@@ -4,7 +4,8 @@ import re
 
 from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
-            
+from mon.utils import get_cmd_data, get_file_data
+
 
 class CpuInfo(CollectorBase):
     '''Get CPU (and other zones) temperature.'''
@@ -16,14 +17,14 @@ class CpuInfo(CollectorBase):
 
         
     def check(self):
-        self._get_cmd_data(['lscpu'])
+        get_cmd_data(['lscpu'])
         
         
     def _get_lscpuinfo(self):
-        output = self._get_cmd_data(['lscpu'], as_lines=True)
+        output = get_cmd_data(['lscpu'], as_lines=True)
 
         # currently not active, as json support in lscpu is quite new
-        #output = self._get_cmd_data(['lscpu', '--json'])
+        #output = get_cmd_data(['lscpu', '--json'])
         #data = json.loads(output)
 
         # Convert json structure. in json, the field names have a trailing
@@ -47,7 +48,7 @@ class CpuInfo(CollectorBase):
 
         data = []
         for filename in sorted(files): 
-            temp = int(self._get_file_data(filename, firstline=True)) / 1000.0
+            temp = int(get_file_data(filename, firstline=True)) / 1000.0
 
             data.append(temp)
 

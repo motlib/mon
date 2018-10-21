@@ -3,6 +3,7 @@ database.'''
 
 import copy
 import json
+import logging
 import threading
 
 import paho.mqtt.client as mqtt
@@ -13,6 +14,8 @@ class MqttListener():
         self._cfg = cfg
         
         self.client = mqtt.Client()
+
+        self.client.enable_logger(logging.getLogger())
 
         if 'user' in cfg and 'password' in cfg:
             client.username_pw_set(

@@ -8,6 +8,7 @@ from datetime import datetime
 
 from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
+from mon.utils import get_cmd_data, get_file_data
 
 
 DNSMASQ_HOST='@localhost'
@@ -27,7 +28,7 @@ class DnsMasqDnsInfo(CollectorBase):
             # dnsmasq statistics to query
             'cachesize.bind',
         ]
-        data = self._get_cmd_data(cmd, as_lines=True)
+        data = get_cmd_data(cmd, as_lines=True)
         if len(data) != 1:
             raise Exception("Dnsmasq does not provide statistics in the expected format. Output was: " + str(data))
 
@@ -47,7 +48,7 @@ class DnsMasqDnsInfo(CollectorBase):
             # servers info does not yet get evaluated
             #'servers.bind'
         ]
-        lines = self._get_cmd_data(cmd, as_lines=True)
+        lines = get_cmd_data(cmd, as_lines=True)
 
         #if len(data) != 7:
         #    raise Exception("Unexpected command output.")
@@ -79,14 +80,14 @@ class DnsMasqDhcpInfo(CollectorBase):
 
         
     def check(self):
-        data = self._get_file_data('/var/lib/misc/dnsmasq.leases', as_lines=True)
+        data = get_file_data('/var/lib/misc/dnsmasq.leases', as_lines=True)
 
 
     def _get_values(self):
         # example line
         # 1539513512 02:42:a0:15:a2:c3 192.168.0.111 opi1 *
 
-        data = self._get_file_data('/var/lib/misc/dnsmasq.leases', as_lines=True)
+        data = get_file_data('/var/lib/misc/dnsmasq.leases', as_lines=True)
 
         leases = []
         

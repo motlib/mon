@@ -18,7 +18,7 @@ def register_collector_class(cls):
     logging.debug(msg.format(clsname=clsname))
 
     
-def _create__instance(clsname, **params):
+def _create_instance(clsname, **params):
     '''Create instance of a collector class.
 
     :param clsname: The class name to instanciate.
@@ -56,7 +56,7 @@ def create_collectors(colcfg, create_all=False):
     
     for cfg in colcfg:
         try:
-            inst = _create__instance(
+            inst = _create_instance(
                 clsname=cfg['class'],
                 cfg=cfg)
             

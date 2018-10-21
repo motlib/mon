@@ -2,7 +2,7 @@ import re
 
 from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
-
+from mon.utils import get_cmd_data
 
 class StorageInfo(CollectorBase):
     def __init__(self, cfg):
@@ -12,7 +12,7 @@ class StorageInfo(CollectorBase):
 
 
     def _get_storage_info(self):
-        data = self._get_cmd_data(['df', '-T'], as_lines=True)
+        data = get_cmd_data(['df', '-T'], as_lines=True)
 
         result = []
         
