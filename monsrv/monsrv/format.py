@@ -69,7 +69,7 @@ def fmt_bytes(b, sig = 3) :
         ('GB', math.pow(1024, 3)),
         ('MB', math.pow(1024, 2)),
         ('kB', math.pow(1024, 1)),
-    }
+    )
 
     fmt = "{v}{u}"
     
