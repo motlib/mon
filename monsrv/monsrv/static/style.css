@@ -32,6 +32,10 @@ p.devinfo {
     border: 2pt solid lightgray;
 }
 
+.toolbox:hover {
+    border-color: gray;
+}
+
 .toolbox .heading {
     font-size: 8pt;
     background-color: lightgray;
@@ -53,10 +57,6 @@ p.devinfo {
 
 .toolbox .heading:hover {
     cursor: pointer;
-}
-
-.toolbox:hover {
-    border-color: blue;
 }
 
 .toolbox .content {
@@ -82,4 +82,8 @@ p.devinfo {
 
 .datatable * th, .datatable * td {
     padding: 1.5pt;
+}
+
+table.datatable tr:hover {
+    background-color: wheat;
 }
