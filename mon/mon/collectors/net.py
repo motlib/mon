@@ -57,11 +57,14 @@ class NetDeviceInfo(CollectorBase):
 
             
         devinfo['hwaddress'] = get_file_data(
-            f"/sys/class/net/{dev}/address", firstline=True).strip()
+            "/sys/class/net/{dev}/address".format(dev=dev),
+            firstline=True).strip()
         devinfo['rx_bytes'] = int(get_file_data(
-            f"/sys/class/net/{dev}/statistics/rx_bytes", firstline=True).strip())
+            "/sys/class/net/{dev}/statistics/rx_bytes".format(dev=dev),
+            firstline=True).strip())
         devinfo['tx_bytes'] = int(get_file_data(
-            f"/sys/class/net/{dev}/statistics/tx_bytes", firstline=True).strip())
+            "/sys/class/net/{dev}/statistics/tx_bytes".format(dev=dev),
+            firstline=True).strip())
         
         return devinfo
 
