@@ -1,0 +1,35 @@
+{% extends "items/itembase.html" %}
+
+{% block itemdata %}
+<table class="datatable">
+  <tr>
+    <th>Device</th>
+    <th>RX Bytes</th>
+    <th>TX Bytes</th>
+    <th>IPv4</th>
+    <th>IPv6</th>
+  </tr>
+  {% for dev in item.devices|sort(attribute='device') %}
+  <tr>
+    <td>{{ dev.device }}</td>
+    <td style="text-align: right">{{ fmt_bytes(dev.rx_bytes) }}</td>
+    <td style="text-align: right">{{ fmt_bytes(dev.tx_bytes) }}</td>
+    <td>
+      {% if dev.ipaddress %}
+      {{ dev.ipaddress }}/{{ dev.netsize }}
+      {% else %}
+      n/a
+      {% endif %}
+    </td>
+    
+    <td>
+      {% if dev.ipv6address %}
+      {{ dev.ipv6address }}/{{ dev.ipv6prefix }}
+      {% else %}
+      n/a
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,78 @@
+import re
+
+from mon.classreg import register_collector_class
+from mon.collectors.base import CollectorBase
+from mon.utils import get_cmd_data, get_file_data
+
+
+class NetDeviceInfo(CollectorBase):
+    '''Get CPU (and other zones) temperature.'''
+    
+    def __init__(self, cfg):
+        super().__init__(
+            cfg=cfg,
+            interval=60)
+
+        
+    def check(self):
+        #get_cmd_data(['lscpu'])
+        pass
+        
+
+    def get_devices(self):
+        cmd = ['ls', '-1', '/sys/class/net']
+
+        devices = get_cmd_data(cmd, as_lines=True)
+
+        return [d.strip() for d in devices if d.strip()!='']
+        
+
+    def get_dev_info(self, dev):
+        '''Get network device info.
+    
+        :param dev: Network device name, e.g. eth0.
+        :return: Dict with device info.'''
+    
+        devinfo = {
+            'device': dev
+        }
+    
+        # Example:
+        # 2: ens160    inet 10.180.2.190/24 brd 10.180.2.255 scope global ens160 ...
+        data = get_cmd_data(['ip','-o','-4', 'address', 'show', dev], firstline=True).strip()
+        m = re.search(r'inet ([.0-9]+)\/([0-9]+)', data)
+            
+        if m:
+            devinfo['ipaddress'] = m.group(1)
+            devinfo['netsize'] = int(m.group(2))
+
+        # Example:
+        # wlp3s0    inet6 fe80::6267:20ff:fe3c:14e8/64 scope link ...
+        data = get_cmd_data(['ip','-o','-6', 'address', 'show', dev], firstline=True).strip()
+        m = re.search(r'inet6 ([0-9a-f:]+)\/([0-9]+)', data)
+            
+        if m:
+            devinfo['ipv6address'] = m.group(1)
+            devinfo['ipv6prefix'] = int(m.group(2))
+
+            
+        devinfo['hwaddress'] = get_file_data(
+            f"/sys/class/net/{dev}/address", firstline=True).strip()
+        devinfo['rx_bytes'] = int(get_file_data(
+            f"/sys/class/net/{dev}/statistics/rx_bytes", firstline=True).strip())
+        devinfo['tx_bytes'] = int(get_file_data(
+            f"/sys/class/net/{dev}/statistics/tx_bytes", firstline=True).strip())
+        
+        return devinfo
+
+
+    def _get_values(self):
+        devs = self.get_devices()
+
+        devinfos = [self.get_dev_info(d) for d in self.get_devices()]
+
+        return {
+            'devices': devinfos
+        }
+
+register_collector_class(NetDeviceInfo)

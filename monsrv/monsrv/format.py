@@ -77,5 +77,5 @@ def fmt_bytes(b, sig = 3) :
         if(b >= r):
             return fmt.format(v=fmt_sig(b / r, sig), u=u)
 
-    return fmt.format(v=fmt_sig(bytes, sig), u='B')
+    return fmt.format(v=0, u='B')
 
