@@ -4,6 +4,6 @@
 <p>
   The cache (max. {{ item.cachesize }} items) had {{ item.hits }} hits and
   {{ item.misses }} misses. This is a hitrate of
-  <b>{{ html_color(item.hitrate_pct, minval=0, maxval=100, fmt='{v:.1f}%') | safe }}</b>
+  <b>{{ html_color(item.hitrate_pct, minval=100, maxval=0, fmt='{v:.1f}%') | safe }}</b>
 </p>
 {% endblock %}

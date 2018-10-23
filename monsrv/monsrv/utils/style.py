@@ -1,7 +1,6 @@
 import math
 
 
-# Color map going from green over orange to red.
 _red_green_map = (
     (0, 200, 0),  # green
     (255,220, 0), # orange

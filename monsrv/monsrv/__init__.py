@@ -5,9 +5,9 @@ from datetime import datetime
 from flask import render_template, Response, abort
 from jinja2.exceptions import TemplateNotFound
 
-from .mqtt_listener import MqttListener
-
 from monsrv.factory import create_app
+from monsrv.mqtt_listener import MqttListener
+
 
 app = create_app()
 
@@ -97,6 +97,10 @@ def host_info(host):
 
 @app.route('/rawhostinfo/<host>')
 def raw_host_info(host):
-    data = mqttl.get_host_data(host)
+    try:
+        data = mqttl.get_host_data(host)
 
-    return Response(json.dumps(data), mimetype='application/json')
+        return Response(json.dumps(data), mimetype='application/json')
+    except KeyError:
+        return abort(404)
+        
