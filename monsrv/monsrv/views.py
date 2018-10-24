@@ -4,13 +4,13 @@ from flask import render_template, Response, abort
 from jinja2.exceptions import TemplateNotFound
 
 from monsrv import app
-from monsrv import mqttl
+from monsrv import mqtt_db
 
 
 @app.route('/')
 def index():
-    hosts = mqttl.get_host_list()
-    classes = mqttl.get_classes()
+    hosts = mqtt_db.get_hosts()
+    classes = mqtt_db.get_classes()
 
     return render_template(
         'index.html',
@@ -78,7 +78,7 @@ def _render_item(host, item):
 def class_info(clsname):
     '''Show info by class name.'''
     
-    data = mqttl.get_class_data(clsname)
+    data = mqtt_db.get_class_data(clsname)
     rendered_items = []
     
     # sort by class name until we have a better idea
@@ -99,7 +99,7 @@ def class_info(clsname):
 @app.route('/hostinfo/<host>')
 def host_info(host):
     try:
-        data = mqttl.get_host_data(host)
+        data = mqtt_db.get_host_data(host)
     except KeyError as e:
         return abort(404)
 
@@ -123,7 +123,7 @@ def host_info(host):
 @app.route('/rawhostinfo/<host>')
 def raw_host_info(host):
     try:
-        data = mqttl.get_host_data(host)
+        data = mqtt_db.get_host_data(host)
 
         return Response(
             json.dumps(data, indent=2),

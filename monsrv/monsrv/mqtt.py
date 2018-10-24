@@ -9,24 +9,9 @@ import threading
 import paho.mqtt.client as mqtt
 
 
-class MqttListener():
+class MqttDb():
     def __init__(self, cfg):
         self._cfg = cfg
-        
-        self.client = mqtt.Client()
-
-        self.client.enable_logger(logging.getLogger())
-
-        if 'user' in cfg and 'password' in cfg:
-            client.username_pw_set(
-                self._cfg['user'],
-                self._cfg['password'])
-
-        self.client.on_connect = self.on_connect
-        self.client.on_message = self.on_message
-        
-        self.client.connect(cfg['broker'], cfg['port'])
-        self.client.loop_start()
 
         # the database is a simple dict
         self._hosts = {}
@@ -34,28 +19,17 @@ class MqttListener():
         self._lock = threading.Lock()
 
         
-    def on_connect(self, client, userdata, flags, rc):
-        '''On connect MQTT event handler'''
+    def handle_mqtt_message(self, topic, payload):
+        # topic is 'BASE_TOPIC/HOST/CLASS'. First we strip the base topic.
+        subtopic = topic[len(self._cfg['base_topic']) + 1:]
+
+        # now we separate host and classname
+        (host, clsname) = subtopic.split('/', maxsplit=1)
         
-        topic = self._cfg['base_topic'] + '/#'
-        client.subscribe(topic)
+        self._store_message_data(host, clsname, payload)
 
-
-    def on_message(self, client, userdata, msg):
-        '''On message MQTT event handler.'''
-        try:
-            # strip base topic and following '/'
-            subtopic = msg.topic[len(self._cfg['base_topic']) + 1:]
-
-            (host, clsname) = subtopic.split('/', maxsplit=1)
         
-            self._handle_message(host, clsname, msg.payload)
-        except Exception as ex:
-            # FIXME: this is in another thread with no logging enabled
-            logging.exception("Failed to handle received message.")
-
-
-    def _handle_message(self, host, clsname, sdata):
+    def _store_message_data(self, host, clsname, sdata):
         '''Put message to local in-memory database. Remove data if host goes
         offline.'''
 
@@ -74,9 +48,9 @@ class MqttListener():
                     self._hosts[host] = {}
 
                 self._hosts[host][clsname] = data
-        
 
-    def get_host_list(self):
+
+    def get_hosts(self):
         '''Returns a list of all known hosts.'''
         
         with self._lock:
@@ -112,6 +86,7 @@ class MqttListener():
             
             return data
 
+        
     def get_classes(self):
         with self._lock:
             classes = {
@@ -122,3 +97,47 @@ class MqttListener():
 
             return classes
         
+
+class MqttListener():
+    def __init__(self, cfg):
+        self._cfg = cfg
+        
+        self.client = mqtt.Client()
+
+        self.client.enable_logger(logging.getLogger())
+
+        if 'user' in cfg and 'password' in cfg:
+            client.username_pw_set(
+                self._cfg['user'],
+                self._cfg['password'])
+
+        self.client.on_connect = self.on_connect
+        self.client.on_message = self.on_message
+        
+        self.client.connect(cfg['broker'], cfg['port'])
+        self.client.loop_start()
+
+        
+    def set_msg_handler(self, msg_hdlr):
+        self._msg_hdlr = msg_hdlr
+        
+        
+    def on_connect(self, client, userdata, flags, rc):
+        '''On connect MQTT event handler'''
+        
+        topic = self._cfg['base_topic'] + '/#'
+        client.subscribe(topic)
+
+
+    def on_message(self, client, userdata, msg):
+        '''On message MQTT event handler.'''
+
+        try:
+            if self._msg_hdlr:
+                self._msg_hdlr(msg.topic, msg.payload)
+            
+        except Exception as ex:
+            # FIXME: this is in another thread with no logging enabled
+            logging.exception("Failed to handle received message.")
+
+            
