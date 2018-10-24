@@ -3,44 +3,25 @@
 {% block title %}Host List{% endblock %}
 
 {% block content %}
-{#
-<table class="datatable">
-  <tr>
-    <th>Class Name</th>
-  </tr>
-  {% for cls in classes | sort%}
-  <tr>
-    <td>
-      <a href="{{ url_for('class_info', clsname=cls) }}">{{ cls }}</a>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
-#}
 
 <h2>View By Class</h2>
-<p>
+
+<ul class="inlinelist">
   {% for cls in classes | sort%}
-  <a href="{{ url_for('class_info', clsname=cls) }}">{{ cls }}</a>
+  <li>
+    <a href="{{ url_for('class_info', clsname=cls) }}">{{ cls }}</a>
+  </li>
   {% endfor %}
-</p>
+</ul>
 
 
+<h2>View By Host</h2>
 
-<table class="datatable" style="margin:5px">
-  <tr>
-    <th>Hostname</th>
-    <th>Raw Data</th>
-  </tr>
+<ul class="inlinelist">
   {% for host in hosts | sort%}
-  <tr>
-    <td>
-      <a href="{{ url_for('host_info', host=host) }}">{{ host }}</a>
-    </td>
-    <td>
-      <a href="{{ url_for('raw_host_info', host=host) }}">raw</a>
-    </td>
-  </tr>
+  <li>
+    <a href="{{ url_for('host_info', host=host) }}">{{ host }}</a>
+  </li>
   {% endfor %}
-</table>
+</ul>
 {% endblock %}

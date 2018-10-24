@@ -72,6 +72,7 @@ p.devinfo {
     margin: 2pt;
 }
 
+
 /* Styles for data tables */
 
 .datatable, .datatable * th, .datatable * td {
@@ -86,4 +87,16 @@ p.devinfo {
 
 table.datatable tr:hover {
     background-color: wheat;
+}
+
+
+/* Inline list */
+
+ul.inlineline {
+    list-style-type: none;
+}
+
+ul.inlinelist li {
+    display: inline;
+    padding: 3pt;
 }
