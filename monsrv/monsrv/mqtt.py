@@ -64,6 +64,11 @@ class MqttDb():
             return copy.deepcopy(self._hosts[host])
 
 
+    def get_host_item_data(self, host, clsname):
+        with self._lock:
+            hostdata = self._hosts[host]
+            return copy.deepcopy(hostdata[clsname])
+
     def get_class_data(self, clsname):
         '''Return a dict of host -> data items where data items are of type classname.'''
         

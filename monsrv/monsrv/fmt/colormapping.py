@@ -1,10 +1,18 @@
+'''Implement colormapping functions, i.e. map a value to a color according to a 
+colormap. Currently only a red-orange-green colormap is available.'''
+
 import math
 
+from jinja2 import Markup
 
+from monsrv import app
+
+# we do not use the fully bright colors (255 values), because this seems to
+# improve readability on white background.
 _red_green_map = (
-    (0, 200, 0),  # green
-    (255,220, 0), # orange
-    (255, 0, 0)   # red
+    (  0, 200,   0),  # green
+    (255, 220,   0), # orange
+    (255,   0,   0)   # red
 ) 
 
 
@@ -62,6 +70,7 @@ def _get_color_mapping(val, minval=0.0, maxval=1.0, cmap=_red_green_map):
 
 
 # Map a value between 0 and 1 to a color between red and green.
+@app.template_filter(name='css_color')
 def get_css_color(v, minval=0.0, maxval=1.0, cmap=_red_green_map):
     col = _get_color_mapping(val=v, minval=minval, maxval=maxval, cmap=cmap)
     
@@ -69,6 +78,7 @@ def get_css_color(v, minval=0.0, maxval=1.0, cmap=_red_green_map):
 
 
 # Return html to format text according to val mapped to a color.
+@app.template_filter(name='html_color')
 def get_html_color(v, minval=0.0, maxval=1.0, fmt='{v}', tag='span', cmap=_red_green_map):
     css_col = get_css_color(v=v, cmap=cmap, minval=minval, maxval=maxval)
     
@@ -76,5 +86,5 @@ def get_html_color(v, minval=0.0, maxval=1.0, fmt='{v}', tag='span', cmap=_red_g
 
     fmt = '<{tag} style="{style}">{fmt}</{tag}>'.format(**locals())
     
-    return fmt.format(v=v)
+    return Markup(fmt.format(v=v))
 

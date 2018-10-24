@@ -4,13 +4,13 @@
 <p>
   Host <b>{{ item.hostname }}</b>
   is running kernel <b>{{ item.kernel_version }}</b>
-  for {{ fmt_date_interval(item.uptime) }}.
+  for {{ item.uptime | fmt_date_interval }}.
 </p>
 
 <p>
   Load average is
-  <b>{{ html_color(item.loadavg[0], minval=0, maxval=1, fmt='{v:.2f}') | safe }}</b>
-  <b>{{ html_color(item.loadavg[1], minval=0, maxval=1, fmt='{v:.2f}') | safe }}</b>
-  <b>{{ html_color(item.loadavg[2], minval=0, maxval=1, fmt='{v:.2f}') | safe }}</b>
+  <b>{{ item.loadavg[0] | html_color(fmt='{v:.2f}') }}</b>
+  <b>{{ item.loadavg[1] | html_color(fmt='{v:.2f}') }}</b>
+  <b>{{ item.loadavg[2] | html_color(fmt='{v:.2f}') }}</b>
 </p>
 {% endblock %}

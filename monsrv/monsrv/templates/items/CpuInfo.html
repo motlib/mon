@@ -7,7 +7,7 @@
   {% if item.zone_temperatures|length > 0 %}
   Zone temperatures:
   {% for t in item.zone_temperatures %}
-  <b>{{ html_color(t, minval=10, maxval=80, fmt='{v:.1f}°C') | safe }}</b>
+  <b>{{ t | html_color(minval=10, maxval=80, fmt='{v:.1f}°C') }}</b>
   {% endfor %}
   {% endif %}
 </p>
@@ -18,8 +18,9 @@
   {{ "%.0f"|format(item.min_frequency) }}
   to
   {{ "%.0f"|format(item.max_frequency) }} MHz.
-  Current frequency: <b>{{ html_color(item.frequency, minval=item.min_frequency,
-  maxval=item.max_frequency, fmt='{v:.0f}MHz') | safe}}</b>
+  Current frequency:
+  <b>{{ item.frequency | html_color(minval=item.min_frequency,
+  maxval=item.max_frequency, fmt='{v:.0f}MHz') }}</b>
 </p>
 {% endif %}
   

@@ -134,3 +134,12 @@ def raw_host_info(host):
     except KeyError:
         return abort(404)
         
+@app.route('/item/<host>/<clsname>')
+def item(host, clsname):
+    try:
+        item = mqtt_db.get_host_item_data(host, clsname)
+    
+        return _render_item(host, item)
+    except KeyError:
+        return abort(404)
+   
