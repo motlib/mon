@@ -1,4 +1,6 @@
+from datetime import datetime
 import json
+import logging
 
 from flask import render_template, Response, abort
 from jinja2.exceptions import TemplateNotFound
@@ -22,13 +24,13 @@ def _update_item_age(item):
     '''Sets the _age and _next_update values for in the item data.'''
     
     try:
-        create_date = datetime.fromtimestamp(item['_timestamp'])
-        age = (datetime.utcnow() - create_data).total_seconds()
+        age = int(datetime.utcnow().timestamp()) - item['_timestamp']
         
         # depending on the time offset of the sender, the age might get negative.
         age = max(age, 0)
-    except:
+    except Exception as ex:
         age = 0
+        logging.exception('Failed to calculate item age.')
 
     item['_age'] = age
     item['_next_update'] = int(item['_interval']) - age
