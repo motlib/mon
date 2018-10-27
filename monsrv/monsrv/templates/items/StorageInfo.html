@@ -1,4 +1,4 @@
-{% extends "items/itembase.html" %}
+{% extends "items/item_base.html" %}
 
 {% block itemdata %}
 {% for fs in item.filesystems | sort(attribute='mount_point') %}

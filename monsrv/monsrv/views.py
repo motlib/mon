@@ -61,7 +61,7 @@ def _render_item(host, item):
         
     except TemplateNotFound as e:
         itemhtml = render_template(
-            'items/PreItem.html',
+            'items/item_raw.html',
             host=host,
             item=item)
         
@@ -73,7 +73,13 @@ def _render_item(host, item):
         logging.exception(msg.format(
             item=item))
 
-        return None
+        return render_template(
+            'items/item_error.html',
+            item=item,
+            clsname=item['_class'],
+            host=host,
+            error_msg=e)
+            
     
 
 @app.route('/clsinfo/<clsname>')
