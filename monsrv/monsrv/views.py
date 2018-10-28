@@ -35,7 +35,22 @@ def _update_item_age(item):
     item['_age'] = age
     item['_next_update'] = int(item['_interval']) - age
 
-        
+
+def _update_all_items_age(items):
+    '''Update item age and next_update values and returns the minimum value for 
+    _next_update.'''
+    
+    for item in items:
+        _update_item_age(item)
+
+    min_update = min(item['_next_update'] for item in items)
+
+    # we add two seconds minimum for refreshing the web page
+    min_update = max(min_update, 5)
+    
+    return min_update
+
+
 def _render_item(host, item):
     '''Render an item template. 
 
@@ -47,8 +62,6 @@ def _render_item(host, item):
 
     '''
     
-    _update_item_age(item)
-        
     try:
         tmpl = 'items/{clsname}.html'.format(clsname=item['_class'])
         
@@ -86,11 +99,14 @@ def _render_item(host, item):
 def class_info(clsname):
     '''Show info by class name.'''
     
-    data = mqtt_db.get_class_data(clsname)
+    items = mqtt_db.get_class_data(clsname)
+
+    min_update_time = _update_all_items_age(items.values())
+    
     rendered_items = []
     
     # sort by class name until we have a better idea
-    for host in sorted(data.keys()):
+    for host in sorted(items.keys()):
         item = data[host]
 
         html = _render_item(host, item)
@@ -101,21 +117,24 @@ def class_info(clsname):
         'clsinfo.html',
         clsname=clsname,
         data=data,
-        rendered_items=rendered_items)
+        rendered_items=rendered_items,
+        min_update=min_update_time)
     
     
 @app.route('/hostinfo/<host>')
 def host_info(host):
     try:
-        data = mqtt_db.get_host_data(host)
+        items = mqtt_db.get_host_data(host)
     except KeyError as e:
         return abort(404)
 
+    min_update_time = _update_all_items_age(items.values())
+        
     rendered_items = []
     
     # sort by class name until we have a better idea
-    for key in sorted(data.keys()):
-        item = data[key]
+    for key in sorted(items.keys()):
+        item = items[key]
 
         html = _render_item(host, item)
         if html != None:
@@ -124,8 +143,8 @@ def host_info(host):
     return render_template(
         'hostinfo.html',
         host=host,
-        data=data,
-        rendered_items=rendered_items)
+        rendered_items=rendered_items,
+        min_update_time=min_update_time)
 
 
 @app.route('/rawhostinfo/<host>')
