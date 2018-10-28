@@ -107,7 +107,7 @@ def class_info(clsname):
     
     # sort by class name until we have a better idea
     for host in sorted(items.keys()):
-        item = data[host]
+        item = items[host]
 
         html = _render_item(host, item)
         if html != None:
@@ -116,7 +116,6 @@ def class_info(clsname):
     return render_template(
         'clsinfo.html',
         clsname=clsname,
-        data=data,
         rendered_items=rendered_items,
         min_update=min_update_time)
     
