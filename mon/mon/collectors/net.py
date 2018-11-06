@@ -15,7 +15,11 @@ class NetDeviceInfo(CollectorBase):
             cfg=cfg,
             interval=20)
 
+        self._filter_devs = cfg['filter_devices'] if 'filter_devices' in cfg else ()
+        
         self.rates = {}
+
+        
 
         
     def check(self):
@@ -95,7 +99,10 @@ class NetDeviceInfo(CollectorBase):
     def _get_values(self):
         devs = self.get_devices()
 
-        devinfos = [self.get_dev_info(d) for d in self.get_devices()]
+        devinfos = [
+            self.get_dev_info(d)
+            for d in self.get_devices()
+            if d not in self._filter_devs]
 
         return {
             'devices': devinfos

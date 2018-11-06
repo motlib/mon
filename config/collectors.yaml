@@ -1,0 +1,4 @@
+# Collector configuration
+- class: mon.collectors.net.NetDeviceInfo
+  filter_devices: lo
+    

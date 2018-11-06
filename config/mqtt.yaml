@@ -1,0 +1,9 @@
+# MQTT configuration
+# hostname of the broker
+broker: opi2
+  
+# MQTT port
+port: 1883
+  
+# MQTT topic prefix
+prefix: mon
