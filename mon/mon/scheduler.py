@@ -5,14 +5,16 @@ from time import sleep
 
 class TaskWrapper():
     def __init__(self, taskobj, interval):
-        self._taskobj = taskobj
+        self.task_object = taskobj
         self._interval = interval
 
         self._next_run = datetime.now()
 
+        self.fail_count = 0
         
+
     def is_ready(self):
-        return self._next_run < datetime.now()
+        return (self._next_run <= datetime.now())
 
     
     def get_next_run(self):
@@ -22,17 +24,12 @@ class TaskWrapper():
     def set_next_run(self):
         self._next_run = (self._next_run + timedelta(seconds=self._interval))
 
-        
-    def get_task_object(self):
-        return self._taskobj
-
-
+    
 class Scheduler():
     def __init__(self, work_fct):
 
         self._tasks = []
         
-        #self._tasks = tasks
         self._work_fct = work_fct
 
         
@@ -44,12 +41,26 @@ class Scheduler():
         '''Process all tasks in ready state by running them through the work_fct.'''
         
         # find ready tasks and run them
-        ready_tasks = (t for t in self._tasks if t.is_ready())
+        ready_tasks = (
+            t
+            for t in self._tasks
+            if t.is_ready() and t.fail_count < 5
+        )
         
         for task in ready_tasks:
-            # FIXME: not so nice, as its not visible that tasks manage their own
-            # next ready time
-            self._work_fct(task.get_task_object())
+            try:
+                # run work function for task
+                self._work_fct(task.task_object)
+
+                # reset fail counter
+                task.fail_count = 0
+            except Exception as e:
+                # increase fail counter on exception
+                task.fail_count += 1
+                
+                msg = "Failed to run task '{0}'."
+                logging.exception(msg.format(task.taskobj))
+                
             task.set_next_run()
 
             
