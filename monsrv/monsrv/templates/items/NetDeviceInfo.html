@@ -4,8 +4,10 @@
 <table class="datatable">
   <tr>
     <th>Device</th>
-    <th>RX Bytes</th>
-    <th>TX Bytes</th>
+    <th>RX Total</th>
+    <th>TX Total</th>
+    <th>RX Rate</th>
+    <th>TX Rate</th>
     <th>IPv4</th>
     <th>IPv6</th>
   </tr>
@@ -14,19 +16,17 @@
     <td>{{ dev.device }}</td>
     <td style="text-align: right">{{ dev.rx_bytes | fmt_bytes }}</td>
     <td style="text-align: right">{{ dev.tx_bytes | fmt_bytes }}</td>
+    <td style="text-align: right">{{ dev.rx_rate | fmt_bytes(baseunit='B/s') }}</td>
+    <td style="text-align: right">{{ dev.tx_rate | fmt_bytes(baseunit='B/s') }}</td>
     <td>
       {% if dev.ipaddress %}
       {{ dev.ipaddress }}/{{ dev.netsize }}
-      {% else %}
-      n/a
       {% endif %}
     </td>
     
     <td>
       {% if dev.ipv6address %}
       {{ dev.ipv6address }}/{{ dev.ipv6prefix }}
-      {% else %}
-      n/a
       {% endif %}
     </td>
   </tr>

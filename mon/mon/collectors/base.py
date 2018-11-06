@@ -13,7 +13,9 @@ class CollectorBase():
         else:
             self._interval = 30
             
-
+        # Create dict used for rates calculation.
+        self._rates = {}
+            
         # this will raise exceptions, if the collector requirements are not
         # fullfilled.
         self.check()
@@ -45,3 +47,36 @@ class CollectorBase():
         return (topic, values)
 
 
+    def _get_rate(self, key, value):
+        '''Helper function to calculate a rate from a counting value. E.g. useful for
+        getting the throughput form a network device total bytes transferred
+        value.
+
+        Example:
+        > _get_rate('example', 12)
+        0
+
+        # 3 seconds later, returns (18-12)/3
+        > _get_rate('example', 18)
+        2.0
+
+        :param key: identifying the rate to be calculated.
+        :param value: New (counter type) value to use for rate calculation.
+
+        :return: On first call, always returns 0. On further calls returns the
+        average change per second of the value parameter between calls. .
+
+        '''
+        
+        if key in self._rates:
+            secs = (datetime.now() - self._rates[key]['time']).total_seconds()
+
+            rate = (value - self._rates[key]['value']) / secs
+        else:
+            self._rates[key] = {}
+            rate = 0
+
+        self._rates[key]['value'] = value
+        self._rates[key]['time'] = datetime.now()
+
+        return rate

@@ -58,7 +58,7 @@ def fmt_sig(num, sig=3):
 
 
 @app.template_filter()
-def fmt_bytes(b, sig = 3) :
+def fmt_bytes(b, sig=3, baseunit='B') :
     '''Format bytes with the right data size value and the specified number of
     significant figures.
 
@@ -72,17 +72,23 @@ def fmt_bytes(b, sig = 3) :
     b = abs(b)
     
     sizes = (
-        ('TB', math.pow(1024, 4)),
-        ('GB', math.pow(1024, 3)),
-        ('MB', math.pow(1024, 2)),
-        ('kB', math.pow(1024, 1)),
+        ('T', math.pow(1024, 4)),
+        ('G', math.pow(1024, 3)),
+        ('M', math.pow(1024, 2)),
+        ('k', math.pow(1024, 1)),
     )
 
-    fmt = "{v}{u}"
+    fmt = "{v}{u}{baseunit}"
     
-    for u, r in sizes:
+    for unit, r in sizes:
         if(b >= r):
-            return fmt.format(v=fmt_sig(b / r, sig), u=u)
+            return fmt.format(
+                v=fmt_sig(b / r, sig),
+                u=unit,
+                baseunit=baseunit)
 
-    return fmt.format(v=0, u='B')
+    return fmt.format(
+        v=0,
+        u='',
+        baseunit=baseunit)
 
