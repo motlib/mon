@@ -50,9 +50,6 @@ class DnsMasqDnsInfo(CollectorBase):
         ]
         lines = get_cmd_data(cmd, as_lines=True)
 
-        #if len(data) != 7:
-        #    raise Exception("Unexpected command output.")
-
         data = {
             'cachesize': int(lines[0].replace('"', '')),
             'insertions': int(lines[1].replace('"', '')),
@@ -93,8 +90,6 @@ class DnsMasqDhcpInfo(CollectorBase):
         
         for line in data:
             fields = line.split()
-            if len(fields) < 4:
-                continue
 
             exp_time = datetime.fromtimestamp(int(fields[0]))
             

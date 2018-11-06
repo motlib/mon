@@ -7,10 +7,4 @@
   for {{ item.uptime | fmt_date_interval }}.
 </p>
 
-<p>
-  Load average is
-  <b>{{ item.loadavg[0] | html_color(fmt='{v:.2f}') }}</b>
-  <b>{{ item.loadavg[1] | html_color(fmt='{v:.2f}') }}</b>
-  <b>{{ item.loadavg[2] | html_color(fmt='{v:.2f}') }}</b>
-</p>
 {% endblock %}

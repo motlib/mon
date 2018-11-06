@@ -54,6 +54,16 @@ class CpuInfo(CollectorBase):
 
         return data
 
+
+    def _get_loadavg(self):
+        loaddata = get_file_data(
+            filename='/proc/loadavg',
+            firstline=True)
+
+        values = [float(v) for v in loaddata.split(' ')[0:3]]
+
+        return values
+
     
     def _get_values(self):
         info = self._get_lscpuinfo()
@@ -72,7 +82,10 @@ class CpuInfo(CollectorBase):
             result['max_frequency'] = float(info['CPU max MHz'])
             
         result['zone_temperatures'] = self._get_temperatures()
-            
+
+        result['loadavg'] = self._get_loadavg()
+
+        
         return result
     
 register_collector_class(CpuInfo)

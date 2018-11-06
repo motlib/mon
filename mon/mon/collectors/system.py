@@ -12,16 +12,6 @@ class HostInfo(CollectorBase):
             interval=60)
 
         
-    def _get_loadavg(self):
-        loaddata = get_file_data(
-            filename='/proc/loadavg',
-            firstline=True)
-
-        values = [float(v) for v in loaddata.split(' ')[0:3]]
-
-        return values
-
-    
     def _get_uptime(self):
         data = get_file_data(
             filename='/proc/uptime',
@@ -41,7 +31,6 @@ class HostInfo(CollectorBase):
         return {
             'hostname': socket.getfqdn(),
             'kernel_version': self._get_kernel(),
-            'loadavg': self._get_loadavg(),
             'uptime': self._get_uptime(),
         }
 
