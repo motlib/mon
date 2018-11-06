@@ -117,7 +117,7 @@ def class_info(clsname):
         'clsinfo.html',
         clsname=clsname,
         rendered_items=rendered_items,
-        min_update=min_update_time)
+        min_update_time=min_update_time)
     
     
 @app.route('/hostinfo/<host>')
