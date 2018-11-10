@@ -101,6 +101,9 @@ def class_info(clsname):
     
     items = mqtt_db.get_class_data(clsname)
 
+    if len(items) == 0:
+        return abort(404)
+
     min_update_time = _update_all_items_age(items.values())
     
     rendered_items = []
