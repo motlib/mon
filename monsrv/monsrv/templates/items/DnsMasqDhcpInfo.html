@@ -13,7 +13,7 @@
     <td>{{ lease.hostname }}</td>
     <td>{{ lease.mac }}</td>
     <td>{{ lease.ip }}</td>
-    <td>{{ lease.expiration }}</td>
+    <td>{{ lease.expiration | fmt_timestamp }}</td>
   </tr>
   {% endfor %}
 </table>

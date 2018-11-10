@@ -91,10 +91,12 @@ class DnsMasqDhcpInfo(CollectorBase):
         for line in data:
             fields = line.split()
 
-            exp_time = datetime.fromtimestamp(int(fields[0]))
-            
+            # invalid lines are silently ignored
+            if len(fields) < 4:
+                continue
+
             lease = {
-                'expiration': exp_time.isoformat(),
+                'expiration': int(fields[0]),
                 'hostname': fields[3],
                 'ip': fields[2],
                 'mac': fields[1],

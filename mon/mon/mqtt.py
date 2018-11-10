@@ -58,9 +58,13 @@ class MqttPublisher():
             msg = 'MQTT public to {topic}: {payload}'
             logging.debug(msg.format(**locals()))
         except Exception as e:
+            # here we log exceptions from the collector, but re-raise, so that
+            # continuously failing publishers can be deactivated in the
+            # scheduler.
             msg = "Failed to publish data from {0} collector."
             logging.exception(msg.format(col.__class__.__name__))
-            
+
+            raise e
             
     def on_connect(self, mqttc, obj, flags, rc):
         '''Event handler for MQTT connect event.'''

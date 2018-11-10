@@ -33,6 +33,12 @@ def fmt_date(dt):
     return str(dt)
 
 
+@app.template_filter()
+def fmt_timestamp(ts):
+    '''Format a unix timestamp as a date / time string.'''
+    return datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+
+
 # FIXME: sometimes due to rounding errors, the number looks like 1.13000000000000001
 @app.template_filter()
 def fmt_sig(num, sig=3):
