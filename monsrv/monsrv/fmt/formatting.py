@@ -1,9 +1,10 @@
 '''Some utility functions for rendering values in html outout.'''
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 import math
 
 from monsrv import app
+
 
 @app.template_filter()
 def fmt_date_interval(seconds):
