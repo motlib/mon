@@ -96,7 +96,7 @@ class DnsMasqDhcpInfo(CollectorBase):
                 continue
 
             lease = {
-                'expiration': int(fields[0]),
+                'lifetime': int(fields[0]) - int(datetime.now().timestamp()),
                 'hostname': fields[3],
                 'ip': fields[2],
                 'mac': fields[1],
