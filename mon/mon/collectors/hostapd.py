@@ -70,8 +70,11 @@ class HostapdInfo(CollectorBase):
         )
         
         for sta in all_data:
-            for k in int_keys:
-                sta[k] = int(sta[k])
+            try:
+                for key in int_keys:
+                    sta[key] = int(sta[key])
+            except:
+                pass
                 
         return all_data
 
