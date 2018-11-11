@@ -59,7 +59,7 @@ class Scheduler():
                 task.fail_count += 1
                 
                 msg = "Failed to run task '{0}'."
-                logging.exception(msg.format(task.taskobj))
+                logging.exception(msg.format(task.task_object))
                 
             task.set_next_run()
 
