@@ -21,7 +21,7 @@ class MqttDb():
         
     def handle_mqtt_message(self, topic, payload):
         # topic is 'BASE_TOPIC/HOST/CLASS'. First we strip the base topic.
-        subtopic = topic[len(self._cfg['base_topic']) + 1:]
+        subtopic = topic[len(self._cfg['prefix']) + 1:]
 
         # now we separate host and classname
         (host, clsname) = subtopic.split('/', maxsplit=1)
@@ -130,7 +130,7 @@ class MqttListener():
     def on_connect(self, client, userdata, flags, rc):
         '''On connect MQTT event handler'''
         
-        topic = self._cfg['base_topic'] + '/#'
+        topic = self._cfg['prefix'] + '/#'
         client.subscribe(topic)
 
 

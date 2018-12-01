@@ -2,4 +2,4 @@
 
 export FLASK_APP=monsrv
 
-pipenv run flask run --host=0.0.0.0
+pipenv run python run.py --config ../config/mqtt.yaml --interface 0.0.0.0 --port 5000
