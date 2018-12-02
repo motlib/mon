@@ -46,11 +46,16 @@ class CpuInfo(CollectorBase):
 
         files = glob.iglob(pattern)
 
-        data = []
-        for filename in sorted(files): 
-            temp = int(get_file_data(filename, firstline=True)) / 1000.0
+        data = [] 
+        for filename in sorted(files):
+            # on OrangePi, there is a thermal_zone1 file, which cannot be read,
+            # so as workaround, we silently ignore exceptions here.
+            try:
+                temp = int(get_file_data(filename, firstline=True)) / 1000.0
 
-            data.append(temp)
+                data.append(temp)
+            except:
+                pass
 
         return data
 
