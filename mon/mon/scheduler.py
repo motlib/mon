@@ -3,7 +3,13 @@ import logging
 from time import sleep
 
 
+# number of times a task can fail in a row, before it is disabled.
+TASK_MAX_FAIL_COUNT = 5
+
+
 class TaskWrapper():
+    # TODO: implement '__str__' function
+    
     def __init__(self, taskobj, interval):
         self.task_object = taskobj
         self._interval = interval
@@ -11,10 +17,13 @@ class TaskWrapper():
         self._next_run = datetime.now()
 
         self.fail_count = 0
+
+        # by default, all tasks are enabled
+        self._enabled = True
         
 
     def is_ready(self):
-        return (self._next_run <= datetime.now())
+        return self._enabled and (self._next_run <= datetime.now())
 
     
     def get_next_run(self):
@@ -24,7 +33,12 @@ class TaskWrapper():
     def set_next_run(self):
         self._next_run = (self._next_run + timedelta(seconds=self._interval))
 
-    
+        
+    def set_enabled(self, val):
+        self._enabled = val
+        
+
+        
 class Scheduler():
     def __init__(self, work_fct):
 
@@ -38,13 +52,14 @@ class Scheduler():
 
         
     def _run_ready_tasks(self):
-        '''Process all tasks in ready state by running them through the work_fct.'''
+        '''Process all tasks in ready state by running them through the
+        work_fct.'''
         
         # find ready tasks and run them
         ready_tasks = (
             t
             for t in self._tasks
-            if t.is_ready() and t.fail_count < 5
+            if t.is_ready()
         )
         
         for task in ready_tasks:
@@ -55,11 +70,17 @@ class Scheduler():
                 # reset fail counter
                 task.fail_count = 0
             except Exception as e:
-                # increase fail counter on exception
-                task.fail_count += 1
-                
                 msg = "Failed to run task '{0}'."
                 logging.exception(msg.format(task.task_object))
+
+                # increase fail counter on exception
+                if task.fail_count < TASK_MAX_FAIL_COUNT:
+                    task.fail_count += 1
+                else:
+                    task.set_enabled(False)
+                    
+                    msg = "Disabling task '{0}', because it failed {1} times."
+                    logging.error(msg.format(task, task.fail_count))
                 
             task.set_next_run()
 

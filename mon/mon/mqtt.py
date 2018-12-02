@@ -49,22 +49,16 @@ class MqttPublisher():
 
     
     def publish_data(self, col):
-        try:
-            (topic, data) = self._prepare_data(col)
+        (topic, data) = self._prepare_data(col)
             
-            payload = json.dumps(data)
-            self.client.publish(topic, payload, retain=True)
+        payload = json.dumps(data)
+        self.client.publish(topic, payload, retain=True)
 
-            msg = 'MQTT public to {topic}: {payload}'
-            logging.debug(msg.format(**locals()))
-        except Exception as e:
-            # here we log exceptions from the collector, but re-raise, so that
-            # continuously failing publishers can be deactivated in the
-            # scheduler.
-            msg = "Failed to publish data from {0} collector."
-            logging.exception(msg.format(col.__class__.__name__))
+        msg = 'MQTT public to {topic}: {payload}'
+        logging.debug(msg.format(**locals()))
 
-            raise e
+        # no logging of exceptions here. This is done in the scheduler.
+        
             
     def on_connect(self, mqttc, obj, flags, rc):
         '''Event handler for MQTT connect event.'''
