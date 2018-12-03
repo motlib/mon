@@ -20,11 +20,11 @@ class MqttDb():
 
         
     def handle_mqtt_message(self, topic, payload):
-        # topic is 'BASE_TOPIC/HOST/CLASS'. First we strip the base topic.
-        subtopic = topic[len(self._cfg['prefix']) + 1:]
+        # Split the topic into parts, then take the last-last one as hostname
+        # and the last one as class name.
+        topic_parts = topic.split('/')
 
-        # now we separate host and classname
-        (host, clsname) = subtopic.split('/', maxsplit=1)
+        host, clsname = topic_parts[-2:]
         
         self._store_message_data(host, clsname, payload)
 
@@ -48,7 +48,7 @@ class MqttDb():
                     self._hosts[host] = {}
 
                 self._hosts[host][clsname] = data
-
+                
 
     def get_hosts(self):
         '''Returns a list of all known hosts.'''
@@ -69,19 +69,12 @@ class MqttDb():
             hostdata = self._hosts[host]
             return copy.deepcopy(hostdata[clsname])
 
+        
     def get_class_data(self, clsname):
-        '''Return a dict of host -> data items where data items are of type classname.'''
+        '''Return a dict of host -> data items where data items are of type
+        classname. '''
         
         with self._lock:
-
-            data = {}
-
-            # FIXME: Currently a host can only have one item per class
-            #for host, hdata in self._hosts.items():
-            #    for v in hdata.values():
-            #        if v['_class'] == clsname:
-            #            data[host] = v
-            
             data = {
                 host: v
                 for host, hdata in self._hosts.items()
@@ -130,7 +123,7 @@ class MqttListener():
     def on_connect(self, client, userdata, flags, rc):
         '''On connect MQTT event handler'''
         
-        topic = self._cfg['prefix'] + '/#'
+        topic = '{prefix}/#'.format(prefix=self._cfg['prefix'])
         client.subscribe(topic)
 
 
