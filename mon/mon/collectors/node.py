@@ -8,14 +8,19 @@ class NodeInfo(CollectorBase):
             cfg=cfg,
             interval=3600)
 
-    def _get_info(self, state):
+        self._state = 'offline'
+
+    def set_state(s):
+        if not s in ('online', 'offline'):
+            raise ValueError('Only online and offline are accepted.')
+
+        self._state = s
+
+                
+    def _get_values(self):
         return {
             'mon_version': mon.__version__.__version__,
-            'state': state,
+            'state': self._state,
         }
-
-        
-    def _get_values(self):
-        return self._get_info('online')
 
 register_collector_class(NodeInfo)

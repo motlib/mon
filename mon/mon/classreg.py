@@ -6,6 +6,7 @@ import logging
 _classes = {}
 
 
+
 def register_collector_class(cls):
     '''Register a collector class, so it can later be instanciated.
 

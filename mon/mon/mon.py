@@ -53,6 +53,30 @@ def setup_logging(verbose=False):
         level=level)
 
 
+import inspect
+from  mon.collectors.base import CollectorBase
+    
+def find_collectors(module, result):
+    # find classes in module, which are subclasses of CollectorBase, but not
+    # CollectorBase itself
+    classes = inspect.getmembers(
+        module,
+        lambda x: inspect.isclass(x) and issubclass(x, CollectorBase) and (x != CollectorBase))
+
+    # Add the found classes to the result
+    result.extend(cls for name,cls in classes)
+
+    # find true sub-modules  (by default, getmembers() finds all imported
+    # modules, also system modules like os, sys, ...)
+    mods = inspect.getmembers(
+        module,
+        lambda m: inspect.ismodule(m) and m.__name__.startswith(module.__name__))
+
+    # recursive call to find classes in sub-modules
+    for name, mod in mods:
+        find_collectors(mod, result)
+
+
 def main():
     args = parse_cmdline()
     setup_logging(args.verbose)
@@ -61,6 +85,11 @@ def main():
     import mon.collectors
 
 
+    result = []
+    find_collectors(mon.collectors, result)
+    print(result)
+
+    
     if args.config != None:
         cfg_dir = args.config
     else:
@@ -76,13 +105,15 @@ def main():
         msg = 'Creating instances of all collectors, overriding configuration.'
         logging.info(msg)
 
-    collector_cfg = load_config(os.path.join(cfg_dir, 'collectors.yaml'))
+    collector_cfg = load_config(
+        filename=os.path.join(cfg_dir, 'collectors.yaml'))
 
     collectors = create_collectors(
         collector_cfg,
         create_all=args.all_collectors)
 
-    mqtt_cfg = load_config(os.path.join(cfg_dir, 'mqtt.yaml'))
+    mqtt_cfg = load_config(
+        filename=os.path.join(cfg_dir, 'mqtt.yaml'))
 
     mqtt_pub = MqttPublisher(
         cfg=mqtt_cfg,
