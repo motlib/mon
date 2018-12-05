@@ -4,7 +4,8 @@ import os
 
 import ruamel.yaml
 
-from mon.classreg import create_collectors
+#from mon.classreg import create_collectors, find_collectors
+from mon.classreg import ClassRegistry
 from mon.mqtt import MqttPublisher
 from mon.scheduler import Scheduler
 import mon.__version__
@@ -30,13 +31,6 @@ def parse_cmdline(args=None):
         default=None)
 
     parser.add_argument(
-        '-a', '--all-collectors',
-        help=(
-            'Create instances of all collectors instead of the ones listed in '
-            'the configuration. '),
-        action='store_true')
-
-    parser.add_argument(
         '-v', '--verbose',
         help='Verbose output',
         action='store_true')
@@ -51,31 +45,7 @@ def setup_logging(verbose=False):
     logging.basicConfig(
         format='%(asctime)s %(levelname)s: %(message)s',
         level=level)
-
-
-import inspect
-from  mon.collectors.base import CollectorBase
     
-def find_collectors(module, result):
-    # find classes in module, which are subclasses of CollectorBase, but not
-    # CollectorBase itself
-    classes = inspect.getmembers(
-        module,
-        lambda x: inspect.isclass(x) and issubclass(x, CollectorBase) and (x != CollectorBase))
-
-    # Add the found classes to the result
-    result.extend(cls for name,cls in classes)
-
-    # find true sub-modules  (by default, getmembers() finds all imported
-    # modules, also system modules like os, sys, ...)
-    mods = inspect.getmembers(
-        module,
-        lambda m: inspect.ismodule(m) and m.__name__.startswith(module.__name__))
-
-    # recursive call to find classes in sub-modules
-    for name, mod in mods:
-        find_collectors(mod, result)
-
 
 def main():
     args = parse_cmdline()
@@ -83,11 +53,15 @@ def main():
 
     # we import collectors here, so logging is already initialized.
     import mon.collectors
+    from mon.collectors.base import CollectorBase
+    
+    registry = ClassRegistry()
 
-
-    result = []
-    find_collectors(mon.collectors, result)
-    print(result)
+    registry.find_classes(
+        module=mon.collectors,
+        baseclass=CollectorBase)
+    
+    #find_collectors(mon.collectors)
 
     
     if args.config != None:
@@ -100,17 +74,12 @@ def main():
         'config'))
 
 
-    if args.all_collectors:
-        # for testing, create an instance of all collectors with default config
-        msg = 'Creating instances of all collectors, overriding configuration.'
-        logging.info(msg)
-
     collector_cfg = load_config(
         filename=os.path.join(cfg_dir, 'collectors.yaml'))
 
-    collectors = create_collectors(
-        collector_cfg,
-        create_all=args.all_collectors)
+    registry.create_all_instances(collector_cfg)
+
+    collectors = registry.get_all_instances()
 
     mqtt_cfg = load_config(
         filename=os.path.join(cfg_dir, 'mqtt.yaml'))
@@ -127,5 +96,8 @@ def main():
         scheduler.add_task(c, c.get_interval())
 
     # run the scheduler until end of time
-    logging.debug('Kicking off the scheduler.')
-    scheduler.run()
+    try:
+        logging.info('Kicking off the scheduler.')
+        scheduler.run()
+    except KeyboardInterrupt:
+        logging.info('Shutting down due to user request. Bye!')

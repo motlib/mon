@@ -1,28 +1,25 @@
 # Collector configuration
-- class: mon.collectors.cpu.CpuInfo
+mon.collectors.cpu.CpuInfo:
   interval: 20
   
-- class: mon.collectors.dnsmasq.DnsMasqDhcpInfo
+mon.collectors.dnsmasq.DnsMasqDhcpInfo:
   interval: 60
   
-- class: mon.collectors.dnsmasq.DnsMasqDnsInfo
+mon.collectors.dnsmasq.DnsMasqDnsInfo:
   interval: 60
   
-- class: mon.collectors.hostapd.HostapdInfo
+mon.collectors.hostapd.HostapdInfo:
   interval: 20
   
-- class: mon.collectors.net.NetDeviceInfo
+mon.collectors.net.NetDeviceInfo:
   filter_devices: lo
   interval: 15
-
-# interval collector, not used at the moment
-- class: mon.collectors.node.NodeInfo
     
-- class: mon.collectors.storage.StorageInfo
+mon.collectors.storage.StorageInfo:
   interval: 30
 
-- class: mon.collectors.system.HostInfo
+mon.collectors.system.HostInfo:
   interval: 900
 
-- class: mon.collectors.system.MemoryInfo
+mon.collectors.system.MemoryInfo:
   interval: 30

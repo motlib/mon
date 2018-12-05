@@ -1,6 +1,6 @@
 # MQTT configuration
 # hostname of the broker
-broker: opi2
+broker: cnshrnd001.cn.kostal.int
   
 # MQTT port
 port: 1883

@@ -1,4 +1,3 @@
-from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
 import mon.__version__
 
@@ -23,4 +22,3 @@ class NodeInfo(CollectorBase):
             'state': self._state,
         }
 
-register_collector_class(NodeInfo)

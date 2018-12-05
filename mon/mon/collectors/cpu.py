@@ -2,7 +2,6 @@ import glob
 import json
 import re
 
-from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
 from mon.utils import get_cmd_data, get_file_data
 
@@ -93,4 +92,3 @@ class CpuInfo(CollectorBase):
         
         return result
     
-register_collector_class(CpuInfo)

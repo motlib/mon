@@ -1,8 +1,8 @@
 import re
 
-from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
 from mon.utils import get_cmd_data
+
 
 class StorageInfo(CollectorBase):
     def __init__(self, cfg):
@@ -53,4 +53,3 @@ class StorageInfo(CollectorBase):
 
         return {'filesystems': stinfo}
         
-register_collector_class(StorageInfo)

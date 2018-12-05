@@ -1,8 +1,6 @@
-
 from datetime import datetime
 import re
 
-from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
 from mon.utils import get_cmd_data, get_file_data
 
@@ -18,8 +16,6 @@ class NetDeviceInfo(CollectorBase):
         self._filter_devs = cfg['filter_devices'] if 'filter_devices' in cfg else ()
         
         self.rates = {}
-
-        
 
         
     def check(self):
@@ -108,4 +104,3 @@ class NetDeviceInfo(CollectorBase):
             'devices': devinfos
         }
 
-register_collector_class(NetDeviceInfo)

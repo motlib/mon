@@ -1,9 +1,9 @@
 import re
 import socket
 
-from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase    
 from mon.utils import get_file_data, get_cmd_data
+
 
 class HostInfo(CollectorBase):
     def __init__(self, cfg):
@@ -33,8 +33,6 @@ class HostInfo(CollectorBase):
             'kernel_version': self._get_kernel(),
             'uptime': self._get_uptime(),
         }
-
-register_collector_class(HostInfo)
 
 
 class MemoryInfo(CollectorBase):
@@ -86,7 +84,6 @@ class MemoryInfo(CollectorBase):
         
         return data
 
-register_collector_class(MemoryInfo)
 
 
 

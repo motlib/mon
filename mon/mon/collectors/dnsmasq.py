@@ -6,7 +6,6 @@
 
 from datetime import datetime
 
-from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
 from mon.utils import get_cmd_data, get_file_data
 
@@ -66,7 +65,6 @@ class DnsMasqDnsInfo(CollectorBase):
         
         return data
 
-register_collector_class(DnsMasqDnsInfo)
 
 
 class DnsMasqDhcpInfo(CollectorBase):
@@ -106,4 +104,3 @@ class DnsMasqDhcpInfo(CollectorBase):
 
         return {'leases': leases}
 
-register_collector_class(DnsMasqDhcpInfo)

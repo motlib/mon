@@ -1,6 +1,5 @@
 import re
 
-from mon.classreg import register_collector_class
 from mon.collectors.base import CollectorBase
 from mon.utils import get_cmd_data
 
@@ -85,4 +84,3 @@ class HostapdInfo(CollectorBase):
         }
 
     
-register_collector_class(HostapdInfo)
