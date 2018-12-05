@@ -3,18 +3,16 @@
 import inspect
 import logging
 
-from  mon.collectors.base import CollectorBase
-
-_classes = {}
-
 
 class ClassRegistry():
     def __init__(self):
-        # class name -> details
         self._classes = []
 
         
     def find_classes(self, module, baseclass):
+        '''Find all classes in module and sub-modules, which are derived from 
+        baseclass and register these classes.'''
+        
         result = []
 
         self._find_classes(result, module, baseclass)
@@ -29,6 +27,10 @@ class ClassRegistry():
 
                 
     def _find_classes(self, result, module, baseclass):
+        '''Internal implementation to find classes derived from baseclass in 
+        module and sub-modules. All found classes are added to the result 
+        list.'''
+        
         # find classes in module, which are subclasses of CollectorBase, but not
         # CollectorBase itself
         classes = inspect.getmembers(
@@ -50,6 +52,8 @@ class ClassRegistry():
 
 
     def register_class(self, cls):
+        '''Register a new class to be handled in the registry.'''
+        
         classinfo = {
             'class': cls,
             'fullname': cls.__module__ + '.' + cls.__name__,
@@ -70,12 +74,12 @@ class ClassRegistry():
         
     
     def create_instance(self, cls, cfg, errors='ignore'):
-        '''Create instance of a collector class.
+        '''Create instance of a collector class and add it to the internal 
+        instances list for this class.
     
-        :param clsname: The class name to instanciate.
-        :param params: And further parameters to pass to the constructor.
-    
-        :return: The new instance.
+        :param cls: The class to instanciate.
+        :param cfg: The config to pass to the constructur when creating the 
+          instance.
         '''
 
         clsinfo = self._get_class_info(cls)
@@ -99,6 +103,11 @@ class ClassRegistry():
 
 
     def create_all_instances(self, cfg):
+        '''Create one instance for each registered class.
+
+        :param cfg: A dictionary classname -> cfg. Each cfg is passed to the 
+          constructor of the corresponding class.'''
+        
         all_classes = [c['class'] for c in self._classes]
 
         for clsinfo in self._classes:
@@ -109,43 +118,9 @@ class ClassRegistry():
 
             
     def get_all_instances(self):
+        '''Return an interator over all created instances of all classs.'''
+        
         for clsinfo in self._classes:
             for inst in clsinfo['instances']:
                 yield inst
 
-
-            
-
-#    def create_collectors(self, colcfg, create_all=False):
-#        '''Create collector instances according to configuration. If a collector 
-#        raises an Exception during instanciation, it is not included in the returned 
-#        list.
-#    
-#        :param colcfg: The collector configurations.
-#        :param create_all: If set to True, all available collectors are created, 
-#            even if not specified in the configuration.
-#    
-#        :return: A list with all instanciated collectors.'''
-#        
-#        collectors = []
-#    
-#        # if specified, ensure that all collectors are used in config
-#        if create_all:
-#            for clsname in _classes.keys():
-#                if len([cfg for cfg in colcfg if cfg['class'] == clsname]) == 0:
-#                    colcfg.append({'class': clsname})
-#        
-#        for cfg in colcfg:
-#            try:
-#                inst = _create_instance(
-#                    clsname=cfg['class'],
-#                    cfg=cfg)
-#                
-#                collectors.append(inst)
-#            except Exception as e:
-#                msg = "Failed to instanciate collector '{0}': {1}"
-#                
-#                logging.warning(msg.format(cfg['class'], e))
-#    
-#        return collectors
-#
