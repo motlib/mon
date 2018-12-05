@@ -73,6 +73,7 @@ class ClassRegistry():
 
         if len(classes) > 0:
             return classes[0]
+        
         return None
         
     
@@ -127,3 +128,15 @@ class ClassRegistry():
             for inst in clsinfo['instances']:
                 yield inst
 
+
+    def get_instance_by_class(self, cls, only_one=True):
+        clsinfo = self._get_class_info(cls)
+
+        if only_one:
+            if len(clsinfo['instances']) > 0:
+                return clsinfo['instances'][0]
+            else:
+                return None
+        else:
+            return clsinfo['instances']
+        

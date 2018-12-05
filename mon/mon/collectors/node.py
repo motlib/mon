@@ -9,7 +9,8 @@ class NodeInfo(CollectorBase):
 
         self._state = 'offline'
 
-    def set_state(s):
+        
+    def set_state(self, s):
         if not s in ('online', 'offline'):
             raise ValueError('Only online and offline are accepted.')
 

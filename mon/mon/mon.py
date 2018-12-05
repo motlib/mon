@@ -4,14 +4,16 @@ import os
 
 import ruamel.yaml
 
-#from mon.classreg import create_collectors, find_collectors
 from mon.classreg import ClassRegistry
+from mon.collectors.node import NodeInfo
 from mon.mqtt import MqttPublisher
 from mon.scheduler import Scheduler
 import mon.__version__
 
 
 def load_config(filename):
+    '''Load the YAML configuration file specified by filename.'''
+    
     yaml = ruamel.yaml.YAML()
     with open(filename, 'r') as f:
         cfg = yaml.load(f)
@@ -20,6 +22,11 @@ def load_config(filename):
 
 
 def parse_cmdline(args=None):
+    '''Parse command-line options.
+
+    :param args: If None, parse sys.argv. Otherwise parse args as a list of 
+      command-line options.'''
+    
     parser = argparse.ArgumentParser(
         prog=mon.__version__.__title__,
         description='')
@@ -35,11 +42,15 @@ def parse_cmdline(args=None):
         help='Verbose output',
         action='store_true')
 
-
     return parser.parse_args(args)
 
 
 def setup_logging(verbose=False):
+    '''Set up logging. 
+
+    :param verbose: If set to true, enable verbose logging output (i.e. print 
+      log message with DEBUG level. Otherwise only up to INFO level).'''
+    
     level = logging.DEBUG if verbose else logging.INFO
 
     logging.basicConfig(
@@ -61,9 +72,6 @@ def main():
         module=mon.collectors,
         baseclass=CollectorBase)
     
-    #find_collectors(mon.collectors)
-
-    
     if args.config != None:
         cfg_dir = args.config
     else:
@@ -79,8 +87,6 @@ def main():
 
     registry.create_all_instances(collector_cfg)
 
-    collectors = registry.get_all_instances()
-
     mqtt_cfg = load_config(
         filename=os.path.join(cfg_dir, 'mqtt.yaml'))
 
@@ -89,10 +95,21 @@ def main():
         verbose=args.verbose
     )
 
+    # Prepare the offline data and set if as last will
+    
+    node_info = registry.get_instance_by_class(NodeInfo)
+
+    node_info.set_state('offline')
+    (topic, payload) = node_info.get_data()
+    
+    mqtt_pub.set_last_will(topic, payload)
+    # set back state to online for normal publishing 
+    node_info.set_state('online')
+    
     scheduler = Scheduler(
         work_fct=lambda col: mqtt_pub.publish_data(col))
 
-    for c in collectors:
+    for c in registry.get_all_instances():
         scheduler.add_task(c, c.get_interval())
 
     # run the scheduler until end of time
