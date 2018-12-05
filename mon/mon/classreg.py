@@ -35,7 +35,10 @@ class ClassRegistry():
         # CollectorBase itself
         classes = inspect.getmembers(
             module,
-            lambda x: inspect.isclass(x) and issubclass(x, CollectorBase) and (x != CollectorBase))
+            lambda x: (
+                inspect.isclass(x)
+                and issubclass(x, baseclass)
+                and (x != baseclass)))
     
         # Add the found classes to the result
         result.extend(cls for (name, cls) in classes)
