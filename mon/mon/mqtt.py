@@ -43,11 +43,11 @@ class MqttPublisher():
         return (topic, data)
 
     
-    def publish_data(self, col):
-        (topic, data) = self._prepare_data(col)
-            
-        payload = json.dumps(data)
-        self.client.publish(topic, payload, retain=True)
+    def publish_data(self, topic, payload):
+        self.client.publish(
+            self._prefix + topic,
+            payload,
+            retain=True)
 
         msg = 'MQTT public to {topic}: {payload}'
         logging.debug(msg.format(**locals()))

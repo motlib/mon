@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging
 import os
 
@@ -83,6 +84,19 @@ def create_collectors(cfg):
 
     return registry
 
+
+
+class MqttCollectorPublisher():
+    def __init__(self, mqtt):
+        self._mqtt = mqtt
+
+    def publish(self, col):
+        (topic, data) = col.get_data()
+        payload = json.dumps(data)
+
+        
+        self._mqtt.publish_data(topic, payload)
+
     
 def main():
     args = parse_cmdline()
@@ -124,9 +138,11 @@ def main():
     mqtt_pub.set_last_will(topic, payload)
     # set back state to online for normal publishing 
     node_info.set_state('online')
+
+    mqtt_col_pub = MqttCollectorPublisher(mqtt_pub)
     
-    scheduler = Scheduler(
-        work_fct=lambda col: mqtt_pub.publish_data(col))
+    scheduler = Scheduler(work_fct=mqtt_col_pub.publish)
+#        work_fct=lambda col: mqtt_pub.publish_data(col))
 
     for c in registry.get_all_instances():
         scheduler.add_task(c, c.get_interval())
