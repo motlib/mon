@@ -58,10 +58,11 @@ def setup_logging(verbose=False):
         level=level)
     
 
-def main():
-    args = parse_cmdline()
-    setup_logging(args.verbose)
+def create_collectors(cfg):
+    '''Find all collector classes and instanciate them. 
 
+    :returns: Class registry.'''
+    
     # we import collectors here, so logging is already initialized.
     import mon.collectors
     from mon.collectors.base import CollectorBase
@@ -71,6 +72,22 @@ def main():
     registry.find_classes(
         module=mon.collectors,
         baseclass=CollectorBase)
+
+    classes = registry.get_classes()
+    msg = 'Registered {0} collectors: {1}'
+    
+    names = sorted([cls.__name__ for cls in classes])
+    logging.info(msg.format(len(classes), ', '.join(names)))
+
+    registry.create_all_instances(cfg)
+
+    return registry
+
+    
+def main():
+    args = parse_cmdline()
+    setup_logging(args.verbose)
+
     
     if args.config != None:
         cfg_dir = args.config
@@ -85,11 +102,13 @@ def main():
     collector_cfg = load_config(
         filename=os.path.join(cfg_dir, 'collectors.yaml'))
 
-    registry.create_all_instances(collector_cfg)
-
     mqtt_cfg = load_config(
         filename=os.path.join(cfg_dir, 'mqtt.yaml'))
 
+    # find all collectors and create instances
+    registry = create_collectors(collector_cfg)
+        
+    
     mqtt_pub = MqttPublisher(
         cfg=mqtt_cfg,
         verbose=args.verbose

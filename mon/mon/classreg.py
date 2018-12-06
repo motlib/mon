@@ -1,71 +1,88 @@
-'''Class registry for data collectors.'''
+'''Class registry for any kind of plug-in system.'''
 
 import inspect
 import logging
-
+from pprint import pprint
 
 class ClassRegistry():
+    '''Class registry for any kind of plug-in system.'''
+
+
     def __init__(self):
         self._classes = []
 
         
     def find_classes(self, module, baseclass):
         '''Find all classes in module and sub-modules, which are derived from 
-        baseclass and register these classes.'''
-        
-        result = []
+        baseclass and register these classes.
 
-        self._find_classes(result, module, baseclass)
+        :param module: The module where to start searching for classes.
+
+        :param baseclass: Only find classes derived from baseclass, i..e. 
+          classes are deteced, if they inherit directly or indirectly from this 
+          baseclass.'''
         
-        for cls in result:
+        count = 0
+        for cls in self._find_classes(module, baseclass):
             self.register_class(cls)
-        
-        msg = 'Located {0} implementations: {1}'
-        names = ', '.join(c.__name__ for c in result)
-        logging.info(msg.format(len(result), names))
+            count += 1
+
+        msg = 'Located and registrered {0} classes'
+        logging.debug(msg.format(count))
 
 
-                
-    def _find_classes(self, result, module, baseclass):
+    def _find_classes(self, module, baseclass):
         '''Internal implementation to find classes derived from baseclass in 
         module and sub-modules. All found classes are added to the result 
         list.'''
-        
-        # find classes in module, which are subclasses of CollectorBase, but not
-        # CollectorBase itself
-        classes = inspect.getmembers(
-            module,
-            lambda x: (
-                inspect.isclass(x)
-                and issubclass(x, baseclass)
-                and (x != baseclass)))
-    
-        # Add the found classes to the result
-        result.extend(cls for (name, cls) in classes)
-    
-        # find true sub-modules  (by default, getmembers() finds all imported
-        # modules, also system modules like os, sys, ...)
-        mods = inspect.getmembers(
-            module,
-            lambda m: inspect.ismodule(m) and m.__name__.startswith(module.__name__))
-    
-        # recursive call to find classes in sub-modules
-        for name, mod in mods:
-            self._find_classes(result, mod, baseclass)
 
+        modules = [module]
+
+        while len(modules) > 0:
+            mod = modules.pop()
+
+            # find classes in module, which are subclasses of baseclass, but
+            # not baseclass itself
+            classes = inspect.getmembers(
+                mod,
+                lambda x: (
+                    inspect.isclass(x)
+                    and issubclass(x, baseclass)
+                    and (x != baseclass)
+                )
+            )
+
+            for (name, cls) in classes:
+                yield cls
+            
+            # find true sub-modules  (by default, getmembers() finds all imported
+            # modules, also system modules like os, sys, ...)
+            submods = inspect.getmembers(
+                mod,
+                lambda m: (
+                    inspect.ismodule(m)
+                    and m.__name__.startswith(module.__name__)))
+
+            modules.extend(mod for (name,mod) in submods)
+    
 
     def register_class(self, cls):
-        '''Register a new class to be handled in the registry.'''
+        '''Register a new class to be handled in the registry.
+
+        :param cls: The class (type object) to register'''
         
         classinfo = {
             'class': cls,
             'fullname': cls.__module__ + '.' + cls.__name__,
             'instances': [],
         }
+    
         self._classes.append(classinfo)
 
 
-    def _get_class_info(self, cls=None):
+    def _get_class_info(self, cls):
+        '''Returns the class info dictionary for the given class.'''
+        
         classes = [c for c in self._classes if c['class'] == cls]
 
         # otherwise the class is registered more than once
@@ -140,3 +157,8 @@ class ClassRegistry():
         else:
             return clsinfo['instances']
         
+
+    def get_classes(self):
+        '''Return a list of all classes'''
+        
+        return [clsinfo['class'] for clsinfo in self._classes]
