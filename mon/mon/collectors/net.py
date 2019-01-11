@@ -1,5 +1,6 @@
 from datetime import datetime
 import re
+import http.client
 
 from mon.collectors.base import CollectorBase
 from mon.utils import get_cmd_data, get_file_data
@@ -104,3 +105,43 @@ class NetDeviceInfo(CollectorBase):
             'devices': devinfos
         }
 
+
+class ConnectivityInfo(CollectorBase):
+    '''Check for internet / network connectivity.'''
+    
+    def __init__(self, cfg):
+        super().__init__(
+            cfg=cfg,
+            interval=120)
+
+        self.checks = (
+            {
+                'host': 'www.a-netz.de',
+                'path': '/',
+                'timeout': 5
+            },
+        )
+
+        
+    def check(self):
+        pass
+
+
+    def check_http(self, host, path):
+        conn = http.client.HTTPConnection(host, timeout=5)
+        try:
+            conn.request('HEAD', path)
+            r = conn.getresponse()
+            conn.close()
+            return True
+        except:
+            conn.close()
+            return False
+    
+    
+    def _get_values(self):
+        results = {
+            check['host']: self.check_http(check)
+            for check in self.checks
+        }
+        return results
