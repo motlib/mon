@@ -1,6 +1,8 @@
 from datetime import datetime
 import re
 import http.client
+import platform
+import subprocess
 
 from mon.collectors.base import CollectorBase
 from mon.utils import get_cmd_data, get_file_data
@@ -114,34 +116,66 @@ class ConnectivityInfo(CollectorBase):
             cfg=cfg,
             interval=120)
 
-        self.checks = (
-            {
-                'host': 'www.a-netz.de',
-                'path': '/',
-                'timeout': 5
-            },
-        )
+        self._check_functions = {
+            'http': self.check_http,
+            'ping': self.check_ping,
+        }
 
         
     def check(self):
         pass
 
 
-    def check_http(self, host, path):
-        conn = http.client.HTTPConnection(host, timeout=5)
+    def check_http(self, check):
+        conn = http.client.HTTPConnection(
+            host=check['host'],
+            timeout=check.get('timeout', 5))
         try:
-            conn.request('HEAD', path)
+            conn.request('HEAD', check['path'])
             r = conn.getresponse()
             conn.close()
             return True
         except:
             conn.close()
-            return False
+            
+        return False
+
+        
+    def check_ping(self, check):
+        '''Returns True if host responds to a ping request.'''
+
+        args = ['ping']
+        if platform.system().lower()=="windows":
+            args.extend(('-n', '1'))
+            args.extend(('-w', str(check.get('timeout', 1) * 1000)))
+        else:
+            args.extend(('-c', '1'))
+            args.extend(('-W', str(check.get('timeout', 1))))
+        args.append(check['host'])
+
+        need_sh = False if platform.system().lower()=="windows" else True
     
+        exitcode = subprocess.call(
+            args,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL)
+
+        return exitcode == 0
+        
     
     def _get_values(self):
-        results = {
-            check['host']: self.check_http(check)
-            for check in self.checks
-        }
-        return results
+
+        results = []
+        
+        for check in self._cfg.get('checks', []):
+            result = dict(check)
+
+            if check['type'] in self._check_functions:
+                result['reachable'] = self._check_functions[check['type']](check)
+            else:
+                msg = "Check type '{0}' not supported."
+                raise Exception(msg.format(check['type']))
+
+            results.append(result)
+            
+        return {'checks': results}

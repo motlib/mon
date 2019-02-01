@@ -128,6 +128,8 @@ def main():
         verbose=args.verbose
     )
 
+    mqtt_pub.connect()
+
     # Prepare the offline data and set if as last will
     
     node_info = registry.get_instance_by_class(NodeInfo)

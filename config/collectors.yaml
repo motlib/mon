@@ -23,3 +23,12 @@ mon.collectors.system.HostInfo:
 
 mon.collectors.system.MemoryInfo:
   interval: 30
+
+mon.collectors.net.ConnectivityInfo:
+  checks:
+    - type: http
+      host: www.a-netz.de
+      path: /
+      timeout: 5
+    - type: ping
+      host: www.bing.com

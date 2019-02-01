@@ -1,7 +1,8 @@
 # MQTT configuration
 # hostname of the broker
-broker: cnshrnd001.cn.kostal.int
-  
+#broker: cnshrnd001.cn.kostal.int
+broker: localhost
+
 # MQTT port
 port: 1883
   
